@@ -1,0 +1,191 @@
+name: Build and Release Receipt Scanner OS Image
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g., v1.0.0)'
+        required: false
+        default: 'latest'
+
+env:
+  IMAGE_NAME: receipt-scanner
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    
+    permissions:
+      contents: write  # Required to create releases and upload assets
+      
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 8192
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            coreutils \
+            quilt \
+            parted \
+            qemu-user-static \
+            debootstrap \
+            zerofree \
+            zip \
+            dosfstools \
+            libarchive-tools \
+            libcap2-bin \
+            grep \
+            rsync \
+            xz-utils \
+            file \
+            git \
+            curl \
+            bc \
+            gpg \
+            pigz
+      
+      - name: Set up build environment
+        run: |
+          # Set release tag
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "RELEASE_TAG=${{ github.event.inputs.release_tag }}" >> $GITHUB_ENV
+          fi
+          
+          # Create build directory
+          mkdir -p pi-gen-build
+          echo "PI_GEN_DIR=$GITHUB_WORKSPACE/pi-gen-build" >> $GITHUB_ENV
+      
+      - name: Build image
+        run: |
+          cd image
+          ./build-image.sh
+        env:
+          PI_GEN_DIR: ${{ env.PI_GEN_DIR }}
+          CLEAN_BUILD: "1"
+      
+      - name: Prepare release artifacts
+        run: |
+          cd pi-gen-build/deploy
+          
+          # Find the built image
+          IMAGE_FILE=$(ls ${IMAGE_NAME}*.img.xz | head -1)
+          
+          if [ -z "$IMAGE_FILE" ]; then
+            echo "Error: No image file found"
+            exit 1
+          fi
+          
+          # Calculate checksums
+          sha256sum "$IMAGE_FILE" > "${IMAGE_FILE}.sha256"
+          
+          # Get image metadata
+          IMAGE_SIZE=$(stat -c%s "$IMAGE_FILE")
+          IMAGE_SIZE_MB=$((IMAGE_SIZE / 1024 / 1024))
+          
+          # Create release notes
+          cat > RELEASE_NOTES.md << EOF
+          # Receipt Scanner OS ${RELEASE_TAG}
+          
+          ## Overview
+          Standalone Raspberry Pi OS image with receipt scanner pre-installed and configured.
+          
+          ## Features
+          - ✅ Raspberry Pi AI Camera support with libcamera
+          - ✅ Tesseract OCR for receipt text extraction
+          - ✅ Built-in Wi-Fi hotspot (SSID: Receipt-Scanner, Password: receipt1234)
+          - ✅ Web interface at http://192.168.4.1
+          - ✅ SQLite and CSV data storage
+          - ✅ Battery monitoring for UPS support
+          - ✅ Automatic service startup on boot
+          
+          ## Compatible Hardware
+          - Raspberry Pi 5 (recommended)
+          - Raspberry Pi 4
+          - Raspberry Pi AI Camera Module
+          - MakerFocus UPS Battery (optional)
+          
+          ## Installation
+          
+          ### Using Raspberry Pi Imager (Recommended)
+          1. Download and install [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
+          2. Choose "Use custom" and select the downloaded \`.img.xz\` file
+          3. Select your SD card and click "Write"
+          4. Boot your Raspberry Pi with the flashed SD card
+          
+          ### Using Command Line
+          \`\`\`bash
+          # Extract and write to SD card (replace /dev/sdX with your SD card device)
+          xzcat $IMAGE_FILE | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+          \`\`\`
+          
+          ## First Boot
+          1. Insert the SD card and power on your Raspberry Pi
+          2. Wait 1-2 minutes for initial boot and services to start
+          3. Connect to Wi-Fi network "Receipt-Scanner" (password: receipt1234)
+          4. Open browser and navigate to http://192.168.4.1
+          5. Default credentials: username \`pi\`, password \`raspberry\`
+          
+          ## Image Details
+          - **Filename**: $IMAGE_FILE
+          - **Size**: ${IMAGE_SIZE_MB}MB compressed
+          - **SHA256**: $(cat ${IMAGE_FILE}.sha256 | cut -d' ' -f1)
+          - **Base**: Raspberry Pi OS Bookworm
+          - **Build Date**: $(date -u +"%Y-%m-%d")
+          
+          ## Security Notes
+          ⚠️ **Important**: Change the default password after first login!
+          \`\`\`bash
+          passwd
+          \`\`\`
+          
+          ## Support
+          - Issues: https://github.com/dog555t/AIscane/issues
+          - Documentation: https://github.com/dog555t/AIscane/blob/main/README.md
+          EOF
+          
+          echo "IMAGE_FILE=$IMAGE_FILE" >> $GITHUB_ENV
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == 'push' || github.event.inputs.release_tag != 'latest'
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Receipt Scanner OS ${{ env.RELEASE_TAG }}
+          body_path: pi-gen-build/deploy/RELEASE_NOTES.md
+          files: |
+            pi-gen-build/deploy/${{ env.IMAGE_NAME }}*.img.xz
+            pi-gen-build/deploy/${{ env.IMAGE_NAME }}*.img.xz.sha256
+            pi-gen-build/deploy/SHA256SUM
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: receipt-scanner-image
+          path: |
+            pi-gen-build/deploy/${{ env.IMAGE_NAME }}*.img.xz
+            pi-gen-build/deploy/*.sha256
+            pi-gen-build/deploy/SHA256SUM
+          retention-days: 7

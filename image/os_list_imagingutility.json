@@ -1,0 +1,25 @@
+{
+  "os_list": [
+    {
+      "name": "Receipt Scanner OS",
+      "description": "Raspberry Pi Receipt Scanner with AI Camera, OCR, and Wi-Fi Hotspot",
+      "icon": "https://raw.githubusercontent.com/dog555t/AIscane/main/image/icon.svg",
+      "url": "https://github.com/dog555t/AIscane/releases/latest/download/receipt-scanner.img.xz",
+      "extract_size": 4294967296,
+      "extract_sha256": "",
+      "image_download_size": 1073741824,
+      "release_date": "2024-01-01",
+      "devices": [
+        "pi4-32bit",
+        "pi4-64bit",
+        "pi5-32bit",
+        "pi5-64bit"
+      ],
+      "init_format": "systemd",
+      "website": "https://github.com/dog555t/AIscane",
+      "description_long": "Turn your Raspberry Pi 5 with AI Camera Module into a self-contained receipt scanner. Features:\n\n• One-click capture with libcamera\n• OCR with Tesseract for automatic data extraction\n• Built-in Wi-Fi hotspot (SSID: Receipt-Scanner)\n• Web interface at 192.168.4.1\n• SQLite and CSV data storage\n• Battery monitoring and safe shutdown support\n\nPerfect for offline receipt management without requiring external network access.",
+      "default_user": "pi",
+      "default_password": "raspberry"
+    }
+  ]
+}
