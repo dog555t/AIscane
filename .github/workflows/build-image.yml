@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     
+    permissions:
+      contents: write  # Required to create releases and upload assets
+      
     steps:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
