@@ -1,3 +1,16 @@
+# DEPRECATED - This workflow uses the old pi-gen system
+# This file has been renamed to .disabled to prevent it from running
+# The project has migrated to rpi-image-gen for faster, simpler builds
+# See .github/workflows/build-image-rpi-gen.yml for the new workflow
+# 
+# Migration benefits:
+# - 30-60 min builds instead of 60-90 min
+# - No root required (uses podman unshare)
+# - Declarative YAML config instead of shell scripts
+# - Official Raspberry Pi tool with active development
+#
+# This file is kept for reference only
+
 name: Build and Release Receipt Scanner OS Image
 
 on:

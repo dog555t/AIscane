@@ -1,4 +1,16 @@
-# Standalone Flashable Image Builder
+# ⚠️ DEPRECATED - Standalone Flashable Image Builder (pi-gen)
+
+> **Warning**: This directory contains the old pi-gen-based build system and is **deprecated**.
+> 
+> **Please use the new rpi-image-gen system instead**: See [`../image-gen/README.md`](../image-gen/README.md)
+>
+> The new system is faster (30-60 min vs 60-90 min), doesn't require root, and uses declarative YAML config.
+>
+> For full migration details, see [DEPRECATED.md](DEPRECATED.md)
+
+---
+
+# Old Documentation (Preserved for Reference)
 
 This folder contains everything needed to create a ready-to-boot Raspberry Pi OS image with the receipt scanner preinstalled, hotspot enabled, and services auto-starting on first boot. The image is compatible with Raspberry Pi Imager and can be distributed as a standalone OS.
 
