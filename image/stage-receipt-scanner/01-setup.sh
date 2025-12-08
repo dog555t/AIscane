@@ -17,6 +17,9 @@ rsync -a --delete --exclude '.git' --exclude '__pycache__' --exclude '.venv' "$S
 # Copy hotspot iptables helper into a root-owned path used by the NAT service.
 install -D -m 755 "${ROOTFS_DIR}/home/pi/receipt-scanner/config/hotspot/iptables.sh" "${ROOTFS_DIR}/usr/local/sbin/receipt-iptables.sh"
 
+# Install first-boot customization script
+install -D -m 755 "${SRC}/image/firstboot.sh" "${ROOTFS_DIR}/usr/local/sbin/receipt-scanner-firstboot.sh"
+
 on_chroot <<'EOFCHROOT'
 set -e
 id -u pi >/dev/null 2>&1 || useradd -m -s /bin/bash pi
@@ -57,4 +60,29 @@ systemctl enable battery_monitor.service
 
 systemctl enable hostapd
 systemctl enable dnsmasq
+
+# Enable I2C for battery monitoring
+if ! grep -q "^dtparam=i2c_arm=on" /boot/config.txt 2>/dev/null; then
+  echo "dtparam=i2c_arm=on" >> /boot/config.txt
+fi
+
+# Create first-boot service to run customization
+cat > /etc/systemd/system/receipt-scanner-firstboot.service << 'EOFSERVICE'
+[Unit]
+Description=Receipt Scanner First Boot Customization
+After=network-online.target
+Before=receipt_scanner.service battery_monitor.service
+ConditionPathExists=!/var/lib/receipt-scanner-firstboot-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/receipt-scanner-firstboot.sh
+ExecStartPost=/bin/touch /var/lib/receipt-scanner-firstboot-done
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOFSERVICE
+
+systemctl enable receipt-scanner-firstboot.service
 EOFCHROOT

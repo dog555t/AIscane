@@ -47,10 +47,39 @@ python app.py
 ```
 Visit http://127.0.0.1:5000 (or http://192.168.4.1 when on the hotspot).
 
+## Quick Start with Pre-built Image (Recommended)
+
+The fastest way to get started is using the pre-built standalone image:
+
+1. **Download the latest image** from [Releases](https://github.com/dog555t/AIscane/releases/latest)
+2. **Flash to SD card** using [Raspberry Pi Imager](https://www.raspberrypi.com/software/):
+   - Choose "Use custom" and select the downloaded `.img.xz` file
+   - Select your SD card and click "Write"
+3. **Boot your Raspberry Pi** with the flashed SD card
+4. **Connect to Wi-Fi**: SSID `Receipt-Scanner`, password `receipt1234`
+5. **Open browser** and navigate to `http://192.168.4.1`
+
+Default login: username `pi`, password `raspberry` (⚠️ change after first login!)
+
+The pre-built image includes everything configured and ready to use.
+
 << codex/build-raspberry-pi-receipt-scanner-project-q6udip
 ## Build a flashable image (pi-gen)
 You can produce a ready-to-boot Raspberry Pi OS image with everything preinstalled using the `image/` folder and `pi-gen`.
 
+### Automated Build (Recommended)
+```bash
+cd image
+./build-image.sh
+```
+
+The script will:
+- Clone/update pi-gen
+- Configure the build
+- Create a compressed `.img.xz` image
+- Generate SHA256 checksums
+
+### Manual Build
 1. Clone `pi-gen` and copy this repo's stage/config:
    ```bash
    git clone https://github.com/RPi-Distro/pi-gen.git
@@ -60,9 +89,16 @@ You can produce a ready-to-boot Raspberry Pi OS image with everything preinstall
    export RECEIPT_SCANNER_SRC=/path/to/repo
    sudo env RECEIPT_SCANNER_SRC="$RECEIPT_SCANNER_SRC" ./build.sh
    ```
-2. Flash the resulting `deploy/receipt-scanner*.img` (or `.zip`) to an SD card.
+2. Flash the resulting `deploy/receipt-scanner*.img.xz` to an SD card.
 
 The stage installs dependencies, copies the app to `/home/pi/receipt-scanner`, enables the web app + battery monitor services, and configures the hotspot/NAT service automatically. For more details see `image/README.md`.
+
+### CI/CD Automated Builds
+Images are automatically built and released via GitHub Actions when a version tag is pushed:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 
 =======
 >> main
