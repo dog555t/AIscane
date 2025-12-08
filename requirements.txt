@@ -1,4 +1,6 @@
 flask
+flask-login
+bcrypt
 pillow
 pytesseract
 opencv-python-headless
