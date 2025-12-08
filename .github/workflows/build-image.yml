@@ -77,25 +77,35 @@ jobs:
       - name: Build image
         run: |
           cd image
-          ./build-image.sh
+          sudo env RECEIPT_SCANNER_SRC="$GITHUB_WORKSPACE" PI_GEN_DIR="${{ env.PI_GEN_DIR }}" CLEAN_BUILD="1" ./build-image.sh
         env:
           PI_GEN_DIR: ${{ env.PI_GEN_DIR }}
           CLEAN_BUILD: "1"
       
       - name: Prepare release artifacts
         run: |
-          cd pi-gen-build/deploy
+          cd ${{ env.PI_GEN_DIR }}/deploy
           
           # Find the built image
-          IMAGE_FILE=$(ls ${IMAGE_NAME}*.img.xz | head -1)
+          IMAGE_FILE=$(ls ${{ env.IMAGE_NAME }}*.img.xz | head -1)
           
           if [ -z "$IMAGE_FILE" ]; then
             echo "Error: No image file found"
             exit 1
           fi
           
-          # Calculate checksums
+          # Create a copy with consistent name for "latest" downloads
+          SIMPLE_NAME="${{ env.IMAGE_NAME }}.img.xz"
+          if [ "$IMAGE_FILE" != "$SIMPLE_NAME" ]; then
+            cp "$IMAGE_FILE" "$SIMPLE_NAME"
+          fi
+          
+          # Calculate checksums for both files
           sha256sum "$IMAGE_FILE" > "${IMAGE_FILE}.sha256"
+          sha256sum "$SIMPLE_NAME" > "${SIMPLE_NAME}.sha256"
+          
+          # Update SHA256SUM file to include both
+          sha256sum "$IMAGE_FILE" "$SIMPLE_NAME" > SHA256SUM
           
           # Get image metadata
           IMAGE_SIZE=$(stat -c%s "$IMAGE_FILE")
@@ -142,7 +152,10 @@ jobs:
           2. Wait 1-2 minutes for initial boot and services to start
           3. Connect to Wi-Fi network "Receipt-Scanner" (password: receipt1234)
           4. Open browser and navigate to http://192.168.4.1
-          5. Default credentials: username \`pi\`, password \`raspberry\`
+          5. Default OS login: username \`pi\`, password \`raspberry\`
+          6. Default web app login: username \`admin\`, password \`admin123\`
+          
+          ⚠️ **Important**: Change both passwords immediately after first login!
           
           ## Image Details
           - **Filename**: $IMAGE_FILE
@@ -152,10 +165,16 @@ jobs:
           - **Build Date**: $(date -u +"%Y-%m-%d")
           
           ## Security Notes
-          ⚠️ **Important**: Change the default password after first login!
+          ⚠️ **Important**: Change the default passwords after first login!
+          
+          **OS Password (SSH/console):**
           \`\`\`bash
           passwd
           \`\`\`
+          
+          **Web App Password:**
+          - Login to web interface at http://192.168.4.1
+          - Go to user menu → Change Password
           
           ## Support
           - Issues: https://github.com/dog555t/AIscane/issues
@@ -170,11 +189,11 @@ jobs:
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: Receipt Scanner OS ${{ env.RELEASE_TAG }}
-          body_path: pi-gen-build/deploy/RELEASE_NOTES.md
+          body_path: ${{ env.PI_GEN_DIR }}/deploy/RELEASE_NOTES.md
           files: |
-            pi-gen-build/deploy/${{ env.IMAGE_NAME }}*.img.xz
-            pi-gen-build/deploy/${{ env.IMAGE_NAME }}*.img.xz.sha256
-            pi-gen-build/deploy/SHA256SUM
+            ${{ env.PI_GEN_DIR }}/deploy/${{ env.IMAGE_NAME }}*.img.xz
+            ${{ env.PI_GEN_DIR }}/deploy/${{ env.IMAGE_NAME }}*.img.xz.sha256
+            ${{ env.PI_GEN_DIR }}/deploy/SHA256SUM
           draft: false
           prerelease: false
         env:
@@ -185,7 +204,7 @@ jobs:
         with:
           name: receipt-scanner-image
           path: |
-            pi-gen-build/deploy/${{ env.IMAGE_NAME }}*.img.xz
-            pi-gen-build/deploy/*.sha256
-            pi-gen-build/deploy/SHA256SUM
+            ${{ env.PI_GEN_DIR }}/deploy/${{ env.IMAGE_NAME }}*.img.xz
+            ${{ env.PI_GEN_DIR }}/deploy/*.sha256
+            ${{ env.PI_GEN_DIR }}/deploy/SHA256SUM
           retention-days: 7
