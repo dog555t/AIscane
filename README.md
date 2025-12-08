@@ -244,3 +244,20 @@ Unplug AC and watch `tail -f data/battery.log`; when percent dips below 10% the 
 ## Notes
 - The Flask debug server is fine for single-user hotspot use. Swap for `gunicorn` if you expect higher load.
 - The `camera.py` helper saves a placeholder gray image if `libcamera` is missing; this keeps the UI usable for development without hardware.
+
+## Building Releases
+
+To create a new release of the standalone OS image:
+
+### Automated Release (Recommended)
+```bash
+# Create and push a version tag
+git tag -a v1.0.0 -m "Release version 1.0.0"
+git push origin v1.0.0
+```
+
+The GitHub Actions workflow will automatically build the image (~60-90 minutes) and create a release.
+
+**Or trigger manually:** Go to [Actions](https://github.com/dog555t/AIscane/actions/workflows/build-image.yml) → "Run workflow"
+
+For complete release documentation, see [RELEASE.md](RELEASE.md).
