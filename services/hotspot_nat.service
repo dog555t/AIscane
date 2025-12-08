@@ -1,0 +1,13 @@
+[Unit]
+Description=Receipt Scanner Hotspot NAT rules
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/sbin/receipt-iptables.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
