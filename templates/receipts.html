@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Receipts</h3>
+    <form class="d-flex" method="get">
+        <input class="form-control me-2" type="search" name="search" placeholder="Search vendor, text" value="{{ search or '' }}">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+</div>
+<div class="table-responsive bg-white shadow-sm">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th><a href="?sort=created_at&order={{ 'asc' if order=='desc' else 'desc' }}">Created</a></th>
+                <th><a href="?sort=vendor&order={{ 'asc' if order=='desc' else 'desc' }}">Vendor</a></th>
+                <th><a href="?sort=date&order={{ 'asc' if order=='desc' else 'desc' }}">Date</a></th>
+                <th><a href="?sort=total&order={{ 'asc' if order=='desc' else 'desc' }}">Total</a></th>
+                <th>Tax</th>
+                <th>Image</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in receipts %}
+            <tr>
+                <td>{{ r.created_at }}</td>
+                <td>{{ r.vendor }}</td>
+                <td>{{ r.date }}</td>
+                <td>{{ r.total }}</td>
+                <td>{{ r.tax }}</td>
+                <td>
+                    {% if r.image_path %}
+                        <small>{{ r.image_path }}</small>
+                    {% endif %}
+                </td>
+                <td><a class="btn btn-sm btn-primary" href="/receipts/{{ r.id }}">Open</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+flask
+pillow
+pytesseract
+opencv-python-headless
+easyocr
+smbus2
+sqlalchemy
+python-dateutil

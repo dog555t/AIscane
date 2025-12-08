@@ -1,0 +1,16 @@
+[Unit]
+Description=Receipt Scanner Web App
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/receipt-scanner
+ExecStart=/usr/bin/python3 /home/pi/receipt-scanner/app.py
+Restart=always
+Environment=FLASK_ENV=production
+StandardOutput=append:/var/log/receipt_scanner.log
+StandardError=append:/var/log/receipt_scanner.err.log
+
+[Install]
+WantedBy=multi-user.target
