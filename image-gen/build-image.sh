@@ -94,12 +94,15 @@ fi
 # Create SHA256SUM file with all checksums
 sha256sum *.img.xz > SHA256SUM 2>/dev/null || true
 
-# Get file size (portable approach)
-if command -v stat >/dev/null 2>&1; then
-    # Try Linux stat first
-    FILE_SIZE=$(stat -c%s "$IMAGE_FILE" 2>/dev/null || stat -f%z "$IMAGE_FILE" 2>/dev/null || echo "0")
+# Get file size (portable approach - try both Linux and macOS stat)
+if stat -c%s "$IMAGE_FILE" >/dev/null 2>&1; then
+    # Linux stat
+    FILE_SIZE=$(stat -c%s "$IMAGE_FILE")
+elif stat -f%z "$IMAGE_FILE" >/dev/null 2>&1; then
+    # macOS/BSD stat
+    FILE_SIZE=$(stat -f%z "$IMAGE_FILE")
 else
-    # Fallback to ls
+    # Fallback: parse ls -l output
     FILE_SIZE=$(ls -l "$IMAGE_FILE" | awk '{print $5}')
 fi
 FILE_SIZE_MB=$((FILE_SIZE / 1024 / 1024))
