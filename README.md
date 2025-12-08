@@ -11,12 +11,14 @@ This project turns a Raspberry Pi 5 + AI Camera Module into a self-contained rec
 - OCR (Tesseract) extracts vendor, date, total, tax, and stores raw text.
 - Data saved to `data/receipts.csv` and mirrored to `data/receipts.db` (SQLite).
 - Web UI (Bootstrap): dashboard, searchable/sortable table, detail & edit view, CSV export.
+- **🔒 Secure authentication**: Password-protected web interface with bcrypt hashing.
 - Hotspot on `192.168.4.1` with captive redirect to the web app.
 - Battery watchdog reads the MakerFocus UPS over I²C, logs %, and triggers safe shutdown below 10%.
 
 ## Folder Layout
 ```
 app.py                  # Flask entrypoint
+auth.py                 # Authentication and user management
 camera.py               # libcamera capture helper
 ocr.py                  # OCR + parsing helpers
 data_store.py          # CSV/SQLite storage
@@ -51,6 +53,22 @@ python app.py
 ```
 Visit http://127.0.0.1:5000 (or http://192.168.4.1 when on the hotspot).
 
+**Default login credentials:**
+- Username: `admin`
+- Password: `admin123`
+
+⚠️ **Important**: Change the default password after first login via the user menu → Change Password.
+
+### Customize Authentication (Optional)
+Set environment variables before running the app:
+```bash
+export RECEIPT_SCANNER_USERNAME="myusername"
+export RECEIPT_SCANNER_PASSWORD="mypassword"
+export SECRET_KEY="your-secret-key-here"
+export HIDE_DEFAULT_CREDENTIALS_HINT="true"  # Hide default credentials on login page
+python app.py
+```
+
 ## Quick Start with Pre-built Image (Recommended)
 
 The fastest way to get started is using the pre-built standalone image:
@@ -62,8 +80,10 @@ The fastest way to get started is using the pre-built standalone image:
 3. **Boot your Raspberry Pi** with the flashed SD card
 4. **Connect to Wi-Fi**: SSID `Receipt-Scanner`, password `receipt1234`
 5. **Open browser** and navigate to `http://192.168.4.1`
+6. **Login with default credentials**: username `admin`, password `admin123`
+7. **⚠️ Change password immediately** via user menu → Change Password
 
-Default login: username `pi`, password `raspberry` (⚠️ change after first login!)
+Default OS login: username `pi`, password `raspberry` (⚠️ change after first login!)
 
 The pre-built image includes everything configured and ready to use.
 
@@ -160,6 +180,39 @@ sudo systemctl enable --now receipt_scanner.service
 sudo systemctl enable --now battery_monitor.service
 ```
 Logs write to `/var/log/receipt_scanner*.log` and `/var/log/battery_monitor*.log`. Update paths inside the unit files if you keep the code elsewhere.
+
+## Security
+
+### Web Application Authentication
+The Flask web application is protected with password authentication:
+- All routes require login (dashboard, receipts, scan, upload, export)
+- Passwords are hashed using bcrypt for secure storage
+- Session management via Flask-Login
+- User data stored in `data/users.json`
+
+**Default Credentials:**
+- Username: `admin`
+- Password: `admin123`
+
+**⚠️ Security Best Practices:**
+1. **Change the default password immediately** after first login
+2. Use the "Change Password" feature in the user menu
+3. Set custom credentials via environment variables:
+   ```bash
+   export RECEIPT_SCANNER_USERNAME="myusername"
+   export RECEIPT_SCANNER_PASSWORD="mypassword"
+   export SECRET_KEY="generate-a-random-key-here"
+   ```
+4. For production deployments, always use a strong, unique password (12+ characters)
+5. Consider changing the Wi-Fi hotspot password in `config/hotspot/hostapd.conf`
+
+### Wi-Fi Hotspot Security
+The default hotspot password is `receipt1234` (configured in `config/hotspot/hostapd.conf`). To change it:
+```bash
+sudo nano /etc/hostapd/hostapd.conf
+# Edit the wpa_passphrase line
+sudo systemctl restart hostapd
+```
 
 ## Battery monitor details
 - Uses I²C fuel gauge at address `0x36` (MAX17043/44 typical for MakerFocus UPS).

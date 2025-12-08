@@ -18,7 +18,21 @@ SQLITE_PATH = DATA_DIR / "receipts.db"
 USERS_PATH = DATA_DIR / "users.json"
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", os.urandom(24).hex())
+# Use environment variable or generate a persistent key stored in data directory
+SECRET_KEY_FILE = DATA_DIR / ".secret_key"
+if os.environ.get("SECRET_KEY"):
+    app.secret_key = os.environ.get("SECRET_KEY")
+elif SECRET_KEY_FILE.exists():
+    app.secret_key = SECRET_KEY_FILE.read_text().strip()
+else:
+    # Generate and save a new secret key
+    app.secret_key = os.urandom(24).hex()
+    os.makedirs(DATA_DIR, exist_ok=True)
+    SECRET_KEY_FILE.write_text(app.secret_key)
+    print(f"Generated new secret key and saved to {SECRET_KEY_FILE}")
+
+# Configuration - hide default credentials hint in production
+app.config['HIDE_DEFAULT_CREDENTIALS_HINT'] = os.environ.get('HIDE_DEFAULT_CREDENTIALS_HINT', 'false').lower() == 'true'
 
 # Initialize Flask-Login
 login_manager = LoginManager()

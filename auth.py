@@ -45,7 +45,12 @@ class UserStore:
         """Load users from file."""
         try:
             return json.loads(self.users_file.read_text())
-        except (json.JSONDecodeError, FileNotFoundError):
+        except json.JSONDecodeError as e:
+            # Log error to help with debugging
+            print(f"Warning: Failed to parse users file {self.users_file}: {e}")
+            print("Starting with empty user database")
+            return {}
+        except FileNotFoundError:
             return {}
     
     def _save_users(self, users: dict):
