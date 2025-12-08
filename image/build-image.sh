@@ -52,9 +52,26 @@ if [ ! -d "$PI_GEN_DIR" ]; then
 else
   echo "Updating pi-gen..."
   cd "$PI_GEN_DIR"
-  git fetch origin
-  git reset --hard origin/master
-  cd - > /dev/null
+git fetch origin
+
+# Determine remote default branch, fall back to main/master
+REMOTE_DEFAULT=$(git remote show origin | sed -n 's/.*HEAD branch: //p' | tr -d '\r\n')
+if [ -n "$REMOTE_DEFAULT" ]; then
+  echo "Resetting pi-gen to origin/$REMOTE_DEFAULT"
+  git reset --hard "origin/$REMOTE_DEFAULT"
+else
+  # Fallback order: main, master
+  if git show-ref --verify --quiet refs/remotes/origin/main; then
+    git reset --hard origin/main
+  elif git show-ref --verify --quiet refs/remotes/origin/master; then
+    git reset --hard origin/master
+  else
+    echo "ERROR: could not determine remote default branch for origin"
+    exit 1
+  fi
+fi
+
+cd - > /dev/null
 fi
 
 # Copy configuration and stage
