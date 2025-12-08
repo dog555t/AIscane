@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Receipt Detail</h3>
+<form method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Vendor</label>
+                <input class="form-control" type="text" name="vendor" value="{{ receipt.vendor }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Date</label>
+                <input class="form-control" type="text" name="date" value="{{ receipt.date }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Total</label>
+                <input class="form-control" type="text" name="total" value="{{ receipt.total }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tax</label>
+                <input class="form-control" type="text" name="tax" value="{{ receipt.tax }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Raw Text</label>
+                <textarea class="form-control" name="raw_text" rows="6">{{ receipt.raw_text }}</textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-outline-secondary" href="/receipts">Back</a>
+        </div>
+        <div class="col-md-6">
+            {% if receipt.image_path %}
+            <div class="card">
+                <div class="card-header">Image</div>
+                <div class="card-body">
+                    <img src="/{{ receipt.image_path }}" alt="Receipt image" class="img-fluid">
+                    <small class="text-muted d-block mt-2">{{ receipt.image_path }}</small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% endblock %}

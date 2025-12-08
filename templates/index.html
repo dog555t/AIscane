@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Receipts</h5>
+                <p class="display-6">{{ count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Total</h5>
+                <p class="display-6">${{ '%.2f'|format(total_sum) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Tax</h5>
+                <p class="display-6">${{ '%.2f'|format(tax_sum) }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Quick Actions</h5>
+        <a class="btn btn-primary" href="/scan">Scan new receipt</a>
+        <a class="btn btn-outline-secondary" href="/upload">Upload image</a>
+        <a class="btn btn-link" href="/receipts">View all</a>
+    </div>
+</div>
+
+{% if battery_line %}
+<div class="alert alert-info">Battery status: {{ battery_line }}</div>
+{% endif %}
+{% endblock %}
