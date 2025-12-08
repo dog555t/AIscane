@@ -3,7 +3,7 @@
     {
       "name": "Receipt Scanner OS",
       "description": "Raspberry Pi Receipt Scanner with AI Camera, OCR, and Wi-Fi Hotspot",
-      "icon": "https://raw.githubusercontent.com/dog555t/AIscane/main/image/icon.png",
+      "icon": "https://raw.githubusercontent.com/dog555t/AIscane/main/image/icon.svg",
       "url": "https://github.com/dog555t/AIscane/releases/latest/download/receipt-scanner.img.xz",
       "extract_size": 4294967296,
       "extract_sha256": "",

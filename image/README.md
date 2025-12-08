@@ -56,11 +56,11 @@ After flashing:
 
 ### Automated Build (Recommended)
 
-Use the provided build script:
+Use the provided build script (requires root):
 
 ```bash
 cd image
-./build-image.sh
+sudo ./build-image.sh
 ```
 
 The script will:
@@ -78,13 +78,13 @@ Environment variables you can set:
 
 ```bash
 # Clean build (remove previous artifacts)
-CLEAN_BUILD=1 ./build-image.sh
+sudo CLEAN_BUILD=1 ./build-image.sh
 
 # Use existing pi-gen directory
-PI_GEN_DIR=/path/to/pi-gen ./build-image.sh
+sudo PI_GEN_DIR=/path/to/pi-gen ./build-image.sh
 
 # Specify architecture (default: arm64)
-BUILD_ARCH=arm64 ./build-image.sh
+sudo BUILD_ARCH=arm64 ./build-image.sh
 ```
 
 ### Manual Build

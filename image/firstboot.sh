@@ -66,12 +66,6 @@ systemctl restart receipt_scanner.service || log "Warning: Failed to start recei
 systemctl restart battery_monitor.service || log "Warning: Failed to start battery_monitor service"
 systemctl restart hotspot_nat.service || log "Warning: Failed to start hotspot_nat service"
 
-# Enable I2C for battery monitoring
-if ! grep -q "^dtparam=i2c_arm=on" /boot/config.txt 2>/dev/null; then
-  log "Enabling I2C interface..."
-  echo "dtparam=i2c_arm=on" >> /boot/config.txt
-fi
-
 log "First boot customization completed successfully!"
 log "Receipt Scanner web interface will be available at http://192.168.4.1"
 log "Connect to WiFi: SSID=Receipt-Scanner, Password=receipt1234"

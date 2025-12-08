@@ -20,8 +20,11 @@ echo "Build architecture: $BUILD_ARCH"
 echo ""
 
 # Check if running as root
-if [ "$EUID" -eq 0 ]; then
-  echo "This script should NOT be run as root. It will use sudo when needed."
+if [ "$EUID" -ne 0 ]; then
+  echo "ERROR: This script must be run with sudo or as root"
+  echo "pi-gen requires root privileges for loop devices and chroot operations"
+  echo ""
+  echo "Usage: sudo ./build-image.sh"
   exit 1
 fi
 
@@ -87,8 +90,8 @@ echo ""
 
 export RECEIPT_SCANNER_SRC="$PROJECT_ROOT"
 
-# Run the build
-sudo env RECEIPT_SCANNER_SRC="$RECEIPT_SCANNER_SRC" ./build.sh
+# Run the build (already running as root)
+env RECEIPT_SCANNER_SRC="$RECEIPT_SCANNER_SRC" ./build.sh
 
 # Check if build succeeded
 if [ ! -d "deploy" ] || [ -z "$(ls -A deploy/*.img* 2>/dev/null)" ]; then
