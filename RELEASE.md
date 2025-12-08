@@ -2,11 +2,15 @@
 
 This document describes how to create and publish new releases of the Receipt Scanner OS image.
 
-## Recent Improvements
+## Recent Improvements (rpi-image-gen Migration)
 
-The release workflow has been updated with the following improvements:
-- ✅ Build script now runs with proper sudo permissions in GitHub Actions
-- ✅ Consistent file paths using `PI_GEN_DIR` environment variable
+The release workflow has been migrated to use **rpi-image-gen** with the following improvements:
+- ✅ **Faster builds** - 30-60 minutes instead of 60-90 minutes (uses pre-built packages)
+- ✅ **No root required** - Uses podman unshare instead of sudo for proper permissions
+- ✅ **Simpler configuration** - Declarative YAML-based config instead of complex shell scripts
+- ✅ **Production-ready** - Same binaries used by millions in Raspberry Pi OS
+- ✅ **Better modularity** - Clean separation with custom layers and validation
+- ✅ **Improved reliability** - Official Raspberry Pi tool with active development
 - ✅ Creates both timestamped and simple filenames (`receipt-scanner.img.xz`) for stable download URLs
 - ✅ Comprehensive release notes include both OS and web app credentials
 - ✅ SHA256 checksums for all image files
@@ -30,7 +34,7 @@ git push origin v1.0.0
 
 ### Method 2: Manual Workflow Dispatch (For testing or ad-hoc builds)
 
-1. Go to: https://github.com/dog555t/AIscane/actions/workflows/build-image.yml
+1. Go to: https://github.com/dog555t/AIscane/actions/workflows/build-image-rpi-gen.yml
 2. Click "Run workflow" button
 3. Optionally enter a release tag (or leave as "latest")
 4. Click "Run workflow" to start the build
@@ -38,11 +42,12 @@ git push origin v1.0.0
 ### Wait for Build
 
 The GitHub Actions workflow will automatically:
-1. Build the complete OS image using pi-gen (60-90 minutes)
-2. Compress the image with xz
-3. Calculate SHA256 checksums
-4. Create a GitHub Release (if using a version tag)
-5. Upload the image and checksums as release assets
+1. Install rpi-image-gen and dependencies
+2. Build the complete OS image using rpi-image-gen (30-60 minutes)
+3. Compress the image with xz
+4. Calculate SHA256 checksums
+5. Create a GitHub Release (if using a version tag)
+6. Upload the image and checksums as release assets
 
 Monitor progress at: https://github.com/dog555t/AIscane/actions
 
@@ -65,22 +70,43 @@ If you added new features, update:
 
 If you need to build locally:
 
+### Prerequisites
+
+First, install rpi-image-gen:
+
+```bash
+# Clone rpi-image-gen
+git clone https://github.com/raspberrypi/rpi-image-gen.git
+cd rpi-image-gen
+
+# Install dependencies
+sudo ./install_deps.sh
+
+# Add to PATH
+export PATH="$PWD:$PATH"
+```
+
 ### 1. Build the Image
 
 ```bash
-cd image
+cd image-gen
 ./build-image.sh
 ```
 
-This takes 30-60 minutes depending on your machine.
+This takes 30-60 minutes depending on your machine (faster than the old pi-gen system).
+
+**Note:** Run as a regular user, NOT as root. rpi-image-gen uses podman unshare for proper permissions.
 
 ### 2. Test the Image
 
 Before releasing, test the built image:
 
 ```bash
+# Find the built image in work directory
+IMAGE_FILE=$(find work -name "receipt-scanner*.img.xz" | head -1)
+
 # Flash to a test SD card
-xzcat pi-gen-build/deploy/receipt-scanner*.img.xz | sudo dd of=/dev/sdX bs=4M status=progress
+xzcat "$IMAGE_FILE" | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
 
 # Boot and verify:
 # - System boots successfully
@@ -229,13 +255,22 @@ For urgent bug fixes:
 
 ### Out of Disk Space
 - GitHub Actions uses `maximize-build-space` action
-- Local builds need 20GB+ free space
-- Clean old builds: `sudo rm -rf pi-gen-build/work pi-gen-build/deploy`
+- Local builds need 10GB+ free space (less than old pi-gen system)
+- Clean old builds: `rm -rf work`
 
-### Build Hangs
-- Check for interactive prompts in package installation
-- Review logs in `pi-gen-build/work/*/build.log`
-- Ensure DEBIAN_FRONTEND=noninteractive is set
+### "rpi-image-gen not found"
+- Make sure rpi-image-gen is installed and in your PATH
+- See manual build prerequisites above
+
+### Permission denied or root-related errors
+- Do NOT run build script as root
+- rpi-image-gen uses podman unshare for proper permissions
+- Run as a regular user: `./build-image.sh`
+
+### Build fails with package download errors
+- Check your internet connection
+- Verify you can access Debian/Raspbian repositories
+- Try again after a few minutes
 
 ### Image Won't Boot
 - Verify image integrity with checksum
@@ -246,29 +281,44 @@ For urgent bug fixes:
 ### GitHub Actions Workflow Issues
 - Ensure repository has write permissions for `contents` (set in workflow)
 - Check that `GITHUB_TOKEN` is available (automatic in GitHub Actions)
-- Build requires ~60-90 minutes and uses GitHub's maximize-build-space action
+- Build requires ~30-60 minutes (faster than old pi-gen)
 - If build times out, increase timeout-minutes in the workflow
 
 ## Workflow Technical Details
 
-The GitHub Actions workflow (`.github/workflows/build-image.yml`):
-- Runs on: `ubuntu-latest` with 180-minute timeout
-- Requires: Root privileges for pi-gen (handled via `sudo`)
-- Environment: Uses `PI_GEN_DIR` for build artifacts
+The GitHub Actions workflow (`.github/workflows/build-image-rpi-gen.yml`):
+- Runs on: `ubuntu-latest` with 120-minute timeout (reduced from 180 minutes)
+- Build System: Uses rpi-image-gen instead of pi-gen
+- Permissions: No root required (uses podman unshare)
+- Environment: Uses `WORK_DIR` for build artifacts
 - Output: Creates compressed `.img.xz` files with SHA256 checksums
 - Release: Automatically creates GitHub release when triggered by version tag
 
 ### Key Steps:
 1. Maximize build space (removes unused packages)
-2. Install pi-gen dependencies (qemu, debootstrap, etc.)
-3. Clone/update pi-gen repository
-4. Run build script with sudo
-5. Prepare release artifacts and notes
-6. Create GitHub release with image files
+2. Install rpi-image-gen and dependencies
+3. Build image with rpi-image-gen (as regular user)
+4. Prepare release artifacts and notes
+5. Create GitHub release with image files
+
+### Migration from pi-gen
+
+The new system offers several advantages:
+
+| Feature | pi-gen (old) | rpi-image-gen (new) |
+|---------|--------------|---------------------|
+| Build time | 60-90 min | 30-60 min |
+| Root required | Yes (sudo) | No (podman) |
+| Config format | Shell scripts | YAML |
+| Package source | Source builds | Pre-built |
+| Validation | Manual | Automatic |
+| Modularity | Stages | Layers |
+| Maintenance | Community | Official Raspberry Pi |
 
 ## Support
 
 For issues with the release process:
 - Check GitHub Actions logs: https://github.com/dog555t/AIscane/actions
-- Review pi-gen documentation: https://github.com/RPi-Distro/pi-gen
+- Review rpi-image-gen documentation: https://raspberrypi.github.io/rpi-image-gen/
+- Review local documentation: `image-gen/README.md`
 - Open an issue: https://github.com/dog555t/AIscane/issues

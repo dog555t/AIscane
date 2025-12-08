@@ -299,11 +299,13 @@ sudo dmesg | tail -50
 ## Technical Details
 
 - **Base OS**: Raspberry Pi OS Bookworm (Debian 12)
+- **Build System**: rpi-image-gen (official Raspberry Pi tool)
 - **Python Version**: 3.11+
 - **OCR Engine**: Tesseract 5.x
 - **Database**: SQLite 3 + CSV
 - **Web Framework**: Flask
 - **Camera Interface**: libcamera
+- **Image Generation**: YAML-based declarative config with modular layers
 
 ## License
 

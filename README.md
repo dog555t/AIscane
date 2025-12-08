@@ -87,35 +87,54 @@ Default OS login: username `pi`, password `raspberry` (⚠️ change after first
 
 The pre-built image includes everything configured and ready to use.
 
-<< codex/build-raspberry-pi-receipt-scanner-project-q6udip
-## Build a flashable image (pi-gen)
-You can produce a ready-to-boot Raspberry Pi OS image with everything preinstalled using the `image/` folder and `pi-gen`.
+## Build a Flashable Image (rpi-image-gen)
 
-### Automated Build (Recommended)
+You can produce a ready-to-boot Raspberry Pi OS image with everything preinstalled using the `image-gen/` folder and **rpi-image-gen** (the official Raspberry Pi image generation tool).
+
+### Why rpi-image-gen?
+
+The project has migrated from pi-gen to rpi-image-gen for:
+- ⚡ **Faster builds** - 30-60 minutes instead of 60-90 minutes
+- 🔒 **Better security** - No root required, uses podman unshare
+- 📝 **Simpler config** - Declarative YAML instead of shell scripts
+- 🎯 **Production-ready** - Official Raspberry Pi tool with same packages used worldwide
+
+### Prerequisites
+
+Install rpi-image-gen:
 ```bash
-cd image
+git clone https://github.com/raspberrypi/rpi-image-gen.git
+cd rpi-image-gen
+sudo ./install_deps.sh
+export PATH="$PWD:$PATH"
+```
+
+### Quick Build
+
+```bash
+cd image-gen
 ./build-image.sh
 ```
 
 The script will:
-- Clone/update pi-gen
-- Configure the build
-- Create a compressed `.img.xz` image
+- Build the complete OS image using rpi-image-gen
+- Install all dependencies and configure services
+- Create a compressed `.img.xz` image in `work/`
 - Generate SHA256 checksums
 
-### Manual Build
-1. Clone `pi-gen` and copy this repo's stage/config:
-   ```bash
-   git clone https://github.com/RPi-Distro/pi-gen.git
-   cd pi-gen
-   cp /path/to/repo/image/pi-gen-config config
-   cp -r /path/to/repo/image/stage-receipt-scanner .
-   export RECEIPT_SCANNER_SRC=/path/to/repo
-   sudo env RECEIPT_SCANNER_SRC="$RECEIPT_SCANNER_SRC" ./build.sh
-   ```
-2. Flash the resulting `deploy/receipt-scanner*.img.xz` to an SD card.
+**Note:** Run as a regular user, NOT as root.
 
-The stage installs dependencies, copies the app to `/home/pi/receipt-scanner`, enables the web app + battery monitor services, and configures the hotspot/NAT service automatically. For more details see `image/README.md`.
+### What Gets Installed
+
+The custom layer (`layer/receipt-scanner.yaml`) automatically:
+- Installs Python, Tesseract OCR, camera support, and all dependencies
+- Copies the app to `/home/pi/receipt-scanner` with virtual environment
+- Configures WiFi hotspot (SSID: Receipt-Scanner, password: receipt1234)
+- Enables systemd services (web app, battery monitor, hotspot NAT)
+- Sets up I2C for battery monitoring
+- Configures first-boot customization
+
+For more details see `image-gen/README.md`.
 
 ### CI/CD Automated Builds
 Images are automatically built and released via GitHub Actions when a version tag is pushed:
