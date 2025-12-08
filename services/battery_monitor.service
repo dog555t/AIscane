@@ -1,0 +1,14 @@
+[Unit]
+Description=MakerFocus UPS Battery Monitor
+After=multi-user.target
+
+[Service]
+User=root
+WorkingDirectory=/home/pi/receipt-scanner
+ExecStart=/usr/bin/python3 /home/pi/receipt-scanner/battery_monitor.py
+Restart=always
+StandardOutput=append:/var/log/battery_monitor.log
+StandardError=append:/var/log/battery_monitor.err.log
+
+[Install]
+WantedBy=multi-user.target
