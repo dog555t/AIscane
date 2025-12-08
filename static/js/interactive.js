@@ -348,14 +348,16 @@ function initFormValidation() {
 // Auto-dismiss alerts after 5 seconds
 setTimeout(function() {
     const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        if (!alert.classList.contains('alert-danger')) {
-            const closeButton = alert.querySelector('.btn-close');
-            if (closeButton) {
-                closeButton.click();
+    if (alerts.length > 0) {
+        alerts.forEach(alert => {
+            if (!alert.classList.contains('alert-danger')) {
+                const closeButton = alert.querySelector('.btn-close');
+                if (closeButton) {
+                    closeButton.click();
+                }
             }
-        }
-    });
+        });
+    }
 }, 5000);
 
 // Add ripple effect to buttons
@@ -384,9 +386,9 @@ document.addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) {
     // Ctrl/Cmd + K for search
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
         const searchInput = document.querySelector('input[type="search"]');
         if (searchInput) {
+            e.preventDefault();
             searchInput.focus();
             searchInput.select();
         }

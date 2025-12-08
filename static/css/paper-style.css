@@ -551,3 +551,17 @@ body > * {
 html {
     scroll-behavior: smooth;
 }
+
+/* Ripple animation for buttons */
+@keyframes ripple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.5;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
