@@ -70,8 +70,7 @@ jobs:
             echo "RELEASE_TAG=${{ github.event.inputs.release_tag }}" >> $GITHUB_ENV
           fi
           
-          # Create build directory
-          mkdir -p pi-gen-build
+          # Set build directory path (do not create it - build-image.sh will handle this)
           echo "PI_GEN_DIR=$GITHUB_WORKSPACE/pi-gen-build" >> $GITHUB_ENV
       
       - name: Build image
