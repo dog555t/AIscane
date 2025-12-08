@@ -46,14 +46,28 @@ if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
 fi
 
 # Clone or update pi-gen
-if [ ! -d "$PI_GEN_DIR" ]; then
+if [ ! -d "$PI_GEN_DIR/.git" ] || [ -z "$(ls -A "$PI_GEN_DIR" 2>/dev/null)" ]; then
   echo "Cloning pi-gen..."
+  rm -rf "$PI_GEN_DIR"
   git clone --depth 1 https://github.com/RPi-Distro/pi-gen.git "$PI_GEN_DIR"
 else
   echo "Updating pi-gen..."
   cd "$PI_GEN_DIR"
-  git fetch origin
-  git reset --hard origin/master
+  git fetch origin --prune
+
+  # Determine origin default branch (works even if it's 'main' or 'master')
+  DEFAULT_BRANCH="$(git remote show origin | sed -n 's/  HEAD branch: //p')"
+  if [ -z "$DEFAULT_BRANCH" ]; then
+    # Fallback: try to use origin/HEAD reference if set, else default to main
+    if git show-ref --verify --quiet refs/remotes/origin/HEAD; then
+      DEFAULT_BRANCH="$(git rev-parse --abbrev-ref origin/HEAD | sed 's@^origin/@@')"
+    else
+      DEFAULT_BRANCH="main"
+    fi
+  fi
+
+  echo "Resetting to origin/${DEFAULT_BRANCH}"
+  git reset --hard "origin/${DEFAULT_BRANCH}"
   cd - > /dev/null
 fi
 
