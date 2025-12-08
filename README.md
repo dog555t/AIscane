@@ -47,6 +47,7 @@ python app.py
 ```
 Visit http://127.0.0.1:5000 (or http://192.168.4.1 when on the hotspot).
 
+<< codex/build-raspberry-pi-receipt-scanner-project-q6udip
 ## Build a flashable image (pi-gen)
 You can produce a ready-to-boot Raspberry Pi OS image with everything preinstalled using the `image/` folder and `pi-gen`.
 
@@ -63,6 +64,8 @@ You can produce a ready-to-boot Raspberry Pi OS image with everything preinstall
 
 The stage installs dependencies, copies the app to `/home/pi/receipt-scanner`, enables the web app + battery monitor services, and configures the hotspot/NAT service automatically. For more details see `image/README.md`.
 
+=======
+>> main
 ## Configure the Wi‑Fi hotspot (hostapd + dnsmasq + dhcpcd)
 1. Install services:
 ```bash
@@ -85,6 +88,7 @@ echo 'net.ipv4.ip_forward=1' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 sudo bash config/hotspot/iptables.sh
 ```
+<< codex/build-raspberry-pi-receipt-scanner-project-q6udip
 You can also enable the provided systemd unit to enforce the NAT rules at boot:
 ```bash
 sudo cp services/hotspot_nat.service /etc/systemd/system/
@@ -93,6 +97,8 @@ sudo chmod +x /usr/local/sbin/receipt-iptables.sh
 sudo systemctl daemon-reload
 sudo systemctl enable --now hotspot_nat.service
 ```
+=======
+>> main
 5. Restart services:
 ```bash
 sudo systemctl restart dhcpcd

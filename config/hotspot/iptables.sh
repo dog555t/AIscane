@@ -1,4 +1,5 @@
 #!/bin/bash
+<< codex/build-raspberry-pi-receipt-scanner-project-q6udip
 set -euo pipefail
 
 # Ensure NAT and forwarding rules exist (idempotent). Designed to be run as root
@@ -16,3 +17,10 @@ if ! iptables -C FORWARD -i wlan0 -o eth0 -j ACCEPT 2>/dev/null; then
 fi
 
 iptables-save > /etc/iptables.ipv4.nat
+=======
+set -e
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+>> main
