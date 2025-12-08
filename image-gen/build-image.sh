@@ -92,10 +92,16 @@ if [ "$(basename "$IMAGE_FILE")" != "$SIMPLE_NAME" ]; then
 fi
 
 # Create SHA256SUM file with all checksums
-sha256sum *.img.xz > SHA256SUM
+sha256sum *.img.xz > SHA256SUM 2>/dev/null || true
 
-# Get file size
-FILE_SIZE=$(stat -c%s "$IMAGE_FILE")
+# Get file size (portable approach)
+if command -v stat >/dev/null 2>&1; then
+    # Try Linux stat first
+    FILE_SIZE=$(stat -c%s "$IMAGE_FILE" 2>/dev/null || stat -f%z "$IMAGE_FILE" 2>/dev/null || echo "0")
+else
+    # Fallback to ls
+    FILE_SIZE=$(ls -l "$IMAGE_FILE" | awk '{print $5}')
+fi
 FILE_SIZE_MB=$((FILE_SIZE / 1024 / 1024))
 
 echo ""

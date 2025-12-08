@@ -64,8 +64,20 @@ mmdebstrap:
       # Create application directory
       install -d -o "$RECEIPT_USER" -g "$RECEIPT_USER" "$1$RECEIPT_HOME"
       
-      # Copy application files (excluding .git, cache, etc.)
-      rsync -a --exclude '.git' --exclude '__pycache__' --exclude '.venv' \
+      # Copy application files (excluding development artifacts)
+      rsync -a \
+        --exclude '.git' \
+        --exclude '__pycache__' \
+        --exclude '.venv' \
+        --exclude '.pytest_cache' \
+        --exclude 'node_modules' \
+        --exclude '*.pyc' \
+        --exclude '*.pyo' \
+        --exclude '.DS_Store' \
+        --exclude 'work' \
+        --exclude 'pi-gen-build' \
+        --exclude '*.img' \
+        --exclude '*.img.xz' \
         "$BDEBSTRAP_SOURCEDIR/../" "$1$RECEIPT_HOME/"
       
       # Ensure correct ownership
@@ -147,8 +159,8 @@ mmdebstrap:
       set -e
       RECEIPT_USER="$IGconf_device_user1"
       
-      # Copy firstboot script
-      install -D -m 755 "$BDEBSTRAP_SOURCEDIR/../image/firstboot.sh" \
+      # Copy firstboot script from image-gen directory
+      install -D -m 755 "$BDEBSTRAP_SOURCEDIR/../image-gen/firstboot.sh" \
         "$1/usr/local/sbin/receipt-scanner-firstboot.sh"
       
       # Create first-boot service
@@ -169,5 +181,10 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 EOFSERVICE
     
-    # Enable all services
-    - $BDEBSTRAP_HOOKS/enable-units "$1" receipt_scanner battery_monitor hotspot_nat hostapd dnsmasq receipt-scanner-firstboot
+    # Enable all services (one per line for readability)
+    - $BDEBSTRAP_HOOKS/enable-units "$1" receipt_scanner
+    - $BDEBSTRAP_HOOKS/enable-units "$1" battery_monitor
+    - $BDEBSTRAP_HOOKS/enable-units "$1" hotspot_nat
+    - $BDEBSTRAP_HOOKS/enable-units "$1" hostapd
+    - $BDEBSTRAP_HOOKS/enable-units "$1" dnsmasq
+    - $BDEBSTRAP_HOOKS/enable-units "$1" receipt-scanner-firstboot

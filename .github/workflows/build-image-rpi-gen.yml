@@ -75,22 +75,27 @@ jobs:
       - name: Prepare release artifacts
         run: |
           # Find the image directory
-          IMAGE_DIR=$(find ${{ env.WORK_DIR }} -type d -name "image-*" | head -1)
+          IMAGE_DIR=$(find ${{ env.WORK_DIR }} -type d -name "image-*" -print -quit)
           
           if [ -z "$IMAGE_DIR" ] || [ ! -d "$IMAGE_DIR" ]; then
             echo "Error: Image directory not found"
+            find ${{ env.WORK_DIR }} -type d -name "image-*" || true
             exit 1
           fi
           
           cd "$IMAGE_DIR"
           
-          # Find the compressed image
-          IMAGE_FILE=$(ls ${{ env.IMAGE_NAME }}*.img.xz 2>/dev/null | head -1)
+          # Find the compressed image (use find instead of ls with glob)
+          IMAGE_FILE=$(find . -maxdepth 1 -name "${{ env.IMAGE_NAME }}*.img.xz" -type f -print -quit)
           
           if [ -z "$IMAGE_FILE" ]; then
             echo "Error: No compressed image file found"
+            ls -la
             exit 1
           fi
+          
+          # Remove leading ./ from filename
+          IMAGE_FILE=$(basename "$IMAGE_FILE")
           
           # Verify checksums exist
           if [ ! -f "${IMAGE_FILE}.sha256" ]; then
