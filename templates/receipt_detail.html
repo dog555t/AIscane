@@ -1,39 +1,69 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>Receipt Detail</h3>
+<div class="mb-4">
+    <h3 style="font-family: 'Courier New', Courier, monospace; font-weight: bold;">
+        📄 Receipt Details
+    </h3>
+</div>
+
 <form method="post">
     <div class="row">
         <div class="col-md-6">
-            <div class="mb-3">
-                <label class="form-label">Vendor</label>
-                <input class="form-control" type="text" name="vendor" value="{{ receipt.vendor }}" required>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">📝 Receipt Information</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">🏪 Vendor</label>
+                        <input class="form-control" type="text" name="vendor" value="{{ receipt.vendor }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">📅 Date</label>
+                        <input class="form-control" type="text" name="date" value="{{ receipt.date }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">💰 Total</label>
+                                <input class="form-control" type="text" name="total" value="{{ receipt.total }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">🧾 Tax</label>
+                                <input class="form-control" type="text" name="tax" value="{{ receipt.tax }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">📄 Raw OCR Text</label>
+                        <textarea class="form-control" name="raw_text" rows="8" style="font-family: 'Courier New', Courier, monospace; font-size: 0.9rem;">{{ receipt.raw_text }}</textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" type="submit">💾 Save Changes</button>
+                        <a class="btn btn-outline-secondary" href="/receipts">← Back to List</a>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Date</label>
-                <input class="form-control" type="text" name="date" value="{{ receipt.date }}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Total</label>
-                <input class="form-control" type="text" name="total" value="{{ receipt.total }}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Tax</label>
-                <input class="form-control" type="text" name="tax" value="{{ receipt.tax }}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Raw Text</label>
-                <textarea class="form-control" name="raw_text" rows="6">{{ receipt.raw_text }}</textarea>
-            </div>
-            <button class="btn btn-primary" type="submit">Save</button>
-            <a class="btn btn-outline-secondary" href="/receipts">Back</a>
         </div>
         <div class="col-md-6">
             {% if receipt.image_path %}
-            <div class="card">
-                <div class="card-header">Image</div>
-                <div class="card-body">
-                    <img src="/{{ receipt.image_path }}" alt="Receipt image" class="img-fluid">
-                    <small class="text-muted d-block mt-2">{{ receipt.image_path }}</small>
+            <div class="card shadow-sm">
+                <div class="card-header" style="background: var(--paper-bg); font-weight: bold;">
+                    🖼️ Receipt Image
+                </div>
+                <div class="card-body text-center">
+                    <img src="/{{ receipt.image_path }}" alt="Receipt image" class="img-fluid" style="max-height: 600px; width: auto;">
+                    <small class="text-muted d-block mt-3">📁 {{ receipt.image_path }}</small>
+                    <p class="text-muted small mt-2">💡 Click image to zoom</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 4rem; opacity: 0.2;">🖼️</div>
+                    <p class="text-muted">No image available for this receipt</p>
                 </div>
             </div>
             {% endif %}

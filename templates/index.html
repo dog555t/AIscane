@@ -1,26 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="mb-4">
+    <h2 class="text-center mb-4" style="font-family: 'Courier New', Courier, monospace; font-weight: bold; color: var(--text-primary);">
+        📊 Receipt Scanner Dashboard
+    </h2>
+</div>
+
 <div class="row mb-4">
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Receipts</h5>
+        <div class="card shadow-sm stats-card">
+            <div class="card-body text-center">
+                <h5 class="card-title">📋 Receipts</h5>
                 <p class="display-6">{{ count }}</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Total</h5>
+        <div class="card shadow-sm stats-card">
+            <div class="card-body text-center">
+                <h5 class="card-title">💰 Total</h5>
                 <p class="display-6">${{ '%.2f'|format(total_sum) }}</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Tax</h5>
+        <div class="card shadow-sm stats-card">
+            <div class="card-body text-center">
+                <h5 class="card-title">🧾 Tax</h5>
                 <p class="display-6">${{ '%.2f'|format(tax_sum) }}</p>
             </div>
         </div>
@@ -29,14 +35,18 @@
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
-        <h5 class="card-title">Quick Actions</h5>
-        <a class="btn btn-primary" href="/scan">Scan new receipt</a>
-        <a class="btn btn-outline-secondary" href="/upload">Upload image</a>
-        <a class="btn btn-link" href="/receipts">View all</a>
+        <h5 class="card-title">⚡ Quick Actions</h5>
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <a class="btn btn-primary btn-lg" href="/scan">📷 Scan New Receipt</a>
+            <a class="btn btn-outline-secondary btn-lg" href="/upload">📤 Upload Image</a>
+            <a class="btn btn-link" href="/receipts">📚 View All Receipts</a>
+        </div>
     </div>
 </div>
 
 {% if battery_line %}
-<div class="alert alert-info">Battery status: {{ battery_line }}</div>
+<div class="alert alert-info">
+    <strong>🔋 Battery Status:</strong> {{ battery_line }}
+</div>
 {% endif %}
 {% endblock %}

@@ -1,10 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>Upload Receipt Image</h3>
-<form method="post" enctype="multipart/form-data">
-    <div class="mb-3">
-        <input class="form-control" type="file" name="file" accept="image/*" required>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-center">📤 Upload Receipt Image</h3>
+                <p class="text-center text-muted mb-4">Upload an existing receipt image for OCR processing</p>
+                
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input class="form-control" type="file" name="file" accept="image/*" required>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-lg" type="submit">
+                            🔍 Upload & Process Receipt
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <a href="/" class="btn btn-link">← Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <button class="btn btn-primary" type="submit">Upload & OCR</button>
-</form>
+</div>
 {% endblock %}
