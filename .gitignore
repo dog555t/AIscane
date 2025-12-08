@@ -2,3 +2,34 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Data and logs
+data/
+*.db
+*.log
+
+# OS and editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+pi-gen-build/
+*.img
+*.img.xz
+*.img.gz
+*.zip
+deploy/
+work/
+
+# Checksums
+SHA256SUM
+*.sha256

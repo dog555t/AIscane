@@ -1,6 +1,10 @@
 # Raspberry Pi Receipt Scanner (Offline Hotspot)
 
+[![Download Latest Image](https://img.shields.io/github/v/release/dog555t/AIscane?label=Download%20Standalone%20Image)](https://github.com/dog555t/AIscane/releases/latest) 
+
 This project turns a Raspberry Pi 5 + AI Camera Module into a self-contained receipt scanner. It captures receipts with `libcamera`, runs OCR, stores structured data in CSV (and SQLite), exposes a local Flask UI, and can broadcast its own Wi‑Fi hotspot so users can connect directly without a router. A MakerFocus UPS battery monitor handles safe shutdowns.
+
+> 🚀 **Quick Start**: Download the [pre-built standalone image](https://github.com/dog555t/AIscane/releases/latest) and flash it with [Raspberry Pi Imager](https://www.raspberrypi.com/software/). See [STANDALONE_IMAGE.md](STANDALONE_IMAGE.md) for complete instructions.
 
 ## Features
 - One-click capture via `/scan` or upload existing images via `/upload`.
