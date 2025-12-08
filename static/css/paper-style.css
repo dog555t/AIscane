@@ -1,0 +1,567 @@
+/* Paper-like Receipt Scanner Styles */
+
+:root {
+    --paper-bg: #f5f3ed;
+    --paper-white: #fefef8;
+    --paper-shadow: rgba(0, 0, 0, 0.12);
+    --paper-border: #e0ddd1;
+    --text-primary: #2c2c2c;
+    --text-secondary: #666;
+    --accent-warm: #d4a574;
+    --accent-blue: #5c8fa8;
+    --accent-green: #7a9f7e;
+    --accent-red: #c77474;
+}
+
+/* Global Paper Background */
+body {
+    background: var(--paper-bg) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Courier New', Courier, monospace;
+    position: relative;
+}
+
+/* Paper texture overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.01) 2px,
+            rgba(0, 0, 0, 0.01) 4px
+        );
+    pointer-events: none;
+    z-index: 0;
+}
+
+body > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Navigation Bar - Receipt Header Style */
+.navbar {
+    background: linear-gradient(to bottom, var(--paper-white), var(--paper-bg)) !important;
+    border-bottom: 2px dashed var(--paper-border) !important;
+    box-shadow: 0 4px 6px var(--paper-shadow);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--text-primary) !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0.5rem 1rem !important;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent-warm);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover {
+    color: var(--text-primary) !important;
+    transform: translateY(-2px);
+}
+
+.nav-link:hover::after {
+    width: 80%;
+}
+
+/* Cards - Paper Sheet Style */
+.card {
+    background: var(--paper-white) !important;
+    border: 1px solid var(--paper-border) !important;
+    box-shadow: 
+        0 2px 4px var(--paper-shadow),
+        0 4px 8px var(--paper-shadow),
+        inset 0 0 60px rgba(0, 0, 0, 0.02);
+    border-radius: 4px !important;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--paper-border),
+        var(--paper-border) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+}
+
+.card:hover {
+    transform: translateY(-4px) rotate(0.5deg);
+    box-shadow: 
+        0 4px 8px var(--paper-shadow),
+        0 8px 16px var(--paper-shadow),
+        inset 0 0 60px rgba(0, 0, 0, 0.02);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px dashed var(--paper-border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Dashboard Stats Cards */
+.display-6 {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: var(--accent-warm);
+    text-align: center;
+    font-size: 2.5rem !important;
+}
+
+/* Buttons - Receipt Stamp Style */
+.btn {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: var(--accent-blue) !important;
+    border: 2px solid var(--accent-blue) !important;
+    box-shadow: 0 2px 4px var(--paper-shadow);
+}
+
+.btn-primary:hover {
+    background: #4a7489 !important;
+    border-color: #4a7489 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--paper-shadow);
+}
+
+.btn-outline-secondary {
+    border: 2px dashed var(--text-secondary) !important;
+    color: var(--text-secondary) !important;
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--text-secondary) !important;
+    color: var(--paper-white) !important;
+    border-style: solid !important;
+}
+
+.btn-link {
+    color: var(--accent-warm) !important;
+    text-decoration: underline !important;
+}
+
+/* Forms - Receipt Field Style */
+.form-control, .form-select {
+    background: var(--paper-white) !important;
+    border: 1px solid var(--paper-border) !important;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--text-primary);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-warm) !important;
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.05),
+        0 0 0 0.2rem rgba(212, 165, 116, 0.25) !important;
+    background: var(--paper-white) !important;
+}
+
+.form-label {
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Table - Receipt List Style */
+.table-responsive {
+    background: var(--paper-white) !important;
+    border: 1px solid var(--paper-border) !important;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px var(--paper-shadow);
+}
+
+.table {
+    font-family: 'Courier New', Courier, monospace;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: var(--paper-bg);
+    color: var(--text-primary);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--paper-border) !important;
+    padding: 1rem;
+}
+
+.table thead th a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.table thead th a:hover {
+    color: var(--accent-warm);
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background: var(--paper-bg) !important;
+    transform: scale(1.01);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* Alerts - Stamped Message Style */
+.alert {
+    border: 2px solid;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    box-shadow: 0 2px 4px var(--paper-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.alert::before {
+    content: '✓';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 120px;
+    opacity: 0.05;
+    transform: rotate(-15deg);
+}
+
+.alert-info {
+    background: var(--paper-white) !important;
+    border-color: var(--accent-blue) !important;
+    color: var(--accent-blue) !important;
+}
+
+.alert-success {
+    background: var(--paper-white) !important;
+    border-color: var(--accent-green) !important;
+    color: var(--accent-green) !important;
+}
+
+.alert-danger {
+    background: var(--paper-white) !important;
+    border-color: var(--accent-red) !important;
+    color: var(--accent-red) !important;
+}
+
+/* Receipt Image */
+.img-fluid {
+    border: 1px solid var(--paper-border);
+    box-shadow: 0 2px 8px var(--paper-shadow);
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+    cursor: zoom-in;
+}
+
+.img-fluid:hover {
+    transform: scale(1.02);
+}
+
+/* Loading Animation */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(245, 243, 237, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid var(--paper-border);
+    border-top: 4px solid var(--accent-warm);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    margin-top: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    background: var(--paper-white);
+    border: 1px solid var(--paper-border);
+    box-shadow: 0 4px 8px var(--paper-shadow);
+    border-radius: 4px;
+}
+
+.dropdown-item {
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: var(--paper-bg);
+    color: var(--accent-warm);
+    padding-left: 1.5rem;
+}
+
+/* File Upload Zone */
+.file-upload-zone {
+    border: 2px dashed var(--paper-border);
+    background: var(--paper-white);
+    padding: 3rem;
+    text-align: center;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.file-upload-zone:hover {
+    border-color: var(--accent-warm);
+    background: var(--paper-bg);
+    transform: scale(1.02);
+}
+
+.file-upload-zone.dragover {
+    border-color: var(--accent-blue);
+    background: rgba(92, 143, 168, 0.1);
+    transform: scale(1.05);
+}
+
+.file-upload-icon {
+    font-size: 4rem;
+    color: var(--accent-warm);
+    margin-bottom: 1rem;
+}
+
+/* Search Bar */
+.search-container {
+    position: relative;
+}
+
+.search-container .form-control {
+    padding-right: 3rem;
+}
+
+.search-container .btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Stats Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card.stats-card {
+    animation: fadeInUp 0.6s ease;
+}
+
+.card.stats-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.card.stats-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.card.stats-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+/* Small responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .display-6 {
+        font-size: 2rem !important;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px) rotate(0deg);
+    }
+}
+
+/* Login Page Specific */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    max-width: 450px;
+    margin: 2rem auto;
+}
+
+/* Scan Button Enhancement */
+.btn-scan {
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+    background: var(--accent-green) !important;
+    border: 2px solid var(--accent-green) !important;
+}
+
+.btn-scan:hover {
+    background: #628f66 !important;
+    border-color: #628f66 !important;
+}
+
+/* Image zoom modal */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    cursor: zoom-out;
+}
+
+.image-modal img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.image-modal.active {
+    display: block;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Ripple animation for buttons */
+@keyframes ripple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.5;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
