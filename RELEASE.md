@@ -2,11 +2,21 @@
 
 This document describes how to create and publish new releases of the Receipt Scanner OS image.
 
+## Recent Improvements
+
+The release workflow has been updated with the following improvements:
+- ✅ Build script now runs with proper sudo permissions in GitHub Actions
+- ✅ Consistent file paths using `PI_GEN_DIR` environment variable
+- ✅ Creates both timestamped and simple filenames (`receipt-scanner.img.xz`) for stable download URLs
+- ✅ Comprehensive release notes include both OS and web app credentials
+- ✅ SHA256 checksums for all image files
+- ✅ Supports both tag-triggered and manual workflow dispatch releases
+
 ## Automated Releases (Recommended)
 
-The easiest way to create a release is using GitHub Actions:
+The easiest way to create a release is using GitHub Actions. There are two methods:
 
-### 1. Create a Version Tag
+### Method 1: Create a Version Tag (Recommended for production releases)
 
 ```bash
 # Ensure you're on main branch with latest changes
@@ -18,26 +28,33 @@ git tag -a v1.0.0 -m "Release version 1.0.0"
 git push origin v1.0.0
 ```
 
-### 2. Wait for Build
+### Method 2: Manual Workflow Dispatch (For testing or ad-hoc builds)
+
+1. Go to: https://github.com/dog555t/AIscane/actions/workflows/build-image.yml
+2. Click "Run workflow" button
+3. Optionally enter a release tag (or leave as "latest")
+4. Click "Run workflow" to start the build
+
+### Wait for Build
 
 The GitHub Actions workflow will automatically:
 1. Build the complete OS image using pi-gen (60-90 minutes)
 2. Compress the image with xz
 3. Calculate SHA256 checksums
-4. Create a GitHub Release
+4. Create a GitHub Release (if using a version tag)
 5. Upload the image and checksums as release assets
 
 Monitor progress at: https://github.com/dog555t/AIscane/actions
 
-### 3. Verify Release
+### Verify Release
 
 Once complete, check:
 - Release appears at: https://github.com/dog555t/AIscane/releases
-- Image file is present: `receipt-scanner-*.img.xz`
+- Image files are present: `receipt-scanner-*.img.xz` and `receipt-scanner.img.xz`
 - Checksums are included: `*.sha256` and `SHA256SUM`
-- Release notes are populated
+- Release notes are populated with installation instructions
 
-### 4. Update Documentation (if needed)
+### Update Documentation (if needed)
 
 If you added new features, update:
 - `README.md` - Quick start guide
@@ -226,9 +243,32 @@ For urgent bug fixes:
 - Check SD card isn't corrupted
 - Use official Raspberry Pi power supply
 
+### GitHub Actions Workflow Issues
+- Ensure repository has write permissions for `contents` (set in workflow)
+- Check that `GITHUB_TOKEN` is available (automatic in GitHub Actions)
+- Build requires ~60-90 minutes and uses GitHub's maximize-build-space action
+- If build times out, increase timeout-minutes in the workflow
+
+## Workflow Technical Details
+
+The GitHub Actions workflow (`.github/workflows/build-image.yml`):
+- Runs on: `ubuntu-latest` with 180-minute timeout
+- Requires: Root privileges for pi-gen (handled via `sudo`)
+- Environment: Uses `PI_GEN_DIR` for build artifacts
+- Output: Creates compressed `.img.xz` files with SHA256 checksums
+- Release: Automatically creates GitHub release when triggered by version tag
+
+### Key Steps:
+1. Maximize build space (removes unused packages)
+2. Install pi-gen dependencies (qemu, debootstrap, etc.)
+3. Clone/update pi-gen repository
+4. Run build script with sudo
+5. Prepare release artifacts and notes
+6. Create GitHub release with image files
+
 ## Support
 
 For issues with the release process:
-- Check GitHub Actions logs
+- Check GitHub Actions logs: https://github.com/dog555t/AIscane/actions
 - Review pi-gen documentation: https://github.com/RPi-Distro/pi-gen
 - Open an issue: https://github.com/dog555t/AIscane/issues
