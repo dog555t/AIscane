@@ -195,6 +195,28 @@ The workflow will:
 3. Compress and checksum the image
 4. Create a GitHub release with artifacts
 
+## Testing the Configuration
+
+Before running a full build, you can validate your configuration:
+
+```bash
+cd image-gen
+
+# Check if rpi-image-gen is available
+which rpi-image-gen
+
+# Validate the config file (requires rpi-image-gen)
+rpi-image-gen config -S . -c receipt-scanner.yaml --validate
+
+# List layers used by the config
+rpi-image-gen config -S . -c receipt-scanner.yaml --list-layers
+
+# Check custom layer metadata
+rpi-image-gen layer -S . --describe receipt-scanner
+```
+
+These commands help ensure your configuration is correct before starting a time-consuming build.
+
 ## Troubleshooting
 
 ### "rpi-image-gen not found"
