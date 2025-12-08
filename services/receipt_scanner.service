@@ -9,6 +9,10 @@ WorkingDirectory=/home/pi/receipt-scanner
 ExecStart=/usr/bin/python3 /home/pi/receipt-scanner/app.py
 Restart=always
 Environment=FLASK_ENV=production
+# Optional: Set custom credentials (uncomment and modify as needed)
+#Environment=RECEIPT_SCANNER_USERNAME=admin
+#Environment=RECEIPT_SCANNER_PASSWORD=admin123
+#Environment=SECRET_KEY=generate-a-random-secret-key
 StandardOutput=append:/var/log/receipt_scanner.log
 StandardError=append:/var/log/receipt_scanner.err.log
 

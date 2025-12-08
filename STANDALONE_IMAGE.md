@@ -95,8 +95,14 @@ sync
    - You should be automatically redirected to the web interface
    - Or manually open: http://192.168.4.1
 
-3. **Start Using**
-   - The web interface loads automatically
+3. **Login to Web Interface**
+   - Default web app credentials:
+     - **Username**: `admin`
+     - **Password**: `admin123`
+   - ⚠️ **Change password immediately** via user menu → Change Password
+
+4. **Start Using**
+   - The dashboard loads after login
    - Click "Scan Receipt" to capture a photo
    - Or upload existing receipt images
    - View, search, and manage your receipts
@@ -106,15 +112,12 @@ sync
 **System Login** (SSH or console):
 - Username: `pi`
 - Password: `raspberry`
+- ⚠️ Change immediately: `ssh pi@192.168.4.1` then run `passwd`
 
 **Web Interface**:
-- No authentication by default (local network only)
-
-⚠️ **Security**: Change the default password immediately:
-```bash
-ssh pi@192.168.4.1
-passwd
-```
+- Username: `admin`
+- Password: `admin123`
+- ⚠️ Change immediately via user menu → Change Password
 
 ## Network Configuration
 
