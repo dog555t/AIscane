@@ -58,6 +58,7 @@ mmdebstrap:
     # Copy application files
     - |
       set -e
+      # Hardcoded to 'pi' (standard Raspberry Pi username) to avoid external config dependency
       RECEIPT_USER="pi"
       RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
       
