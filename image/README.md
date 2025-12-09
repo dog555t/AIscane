@@ -213,7 +213,7 @@ Example JSON for custom distribution:
 ### Build fails with "out of space"
 - Ensure at least 20GB free space
 - Use `CLEAN_BUILD=1` to remove old artifacts
-- GitHub Actions uses maximize-build-space action
+- Note: The new rpi-image-gen system no longer uses the maximize-build-space action
 
 ### Services don't start on first boot
 - Check logs: `journalctl -u receipt_scanner.service`

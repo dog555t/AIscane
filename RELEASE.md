@@ -254,9 +254,9 @@ For urgent bug fixes:
 ## Troubleshooting Build Issues
 
 ### Out of Disk Space
-- GitHub Actions uses `maximize-build-space` action
 - Local builds need 10GB+ free space (less than old pi-gen system)
 - Clean old builds: `rm -rf work`
+- Ensure your GitHub Actions runner has sufficient space available
 
 ### "rpi-image-gen not found"
 - Make sure rpi-image-gen is installed and in your PATH
@@ -295,11 +295,10 @@ The GitHub Actions workflow (`.github/workflows/build-image-rpi-gen.yml`):
 - Release: Automatically creates GitHub release when triggered by version tag
 
 ### Key Steps:
-1. Maximize build space (removes unused packages)
-2. Install rpi-image-gen and dependencies
-3. Build image with rpi-image-gen (as regular user)
-4. Prepare release artifacts and notes
-5. Create GitHub release with image files
+1. Install rpi-image-gen and dependencies
+2. Build image with rpi-image-gen (as regular user)
+3. Prepare release artifacts and notes
+4. Create GitHub release with image files
 
 ### Migration from pi-gen
 
