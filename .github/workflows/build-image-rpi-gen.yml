@@ -36,7 +36,12 @@ jobs:
           echo "/tmp/rpi-image-gen" >> $GITHUB_PATH
           
       - name: Verify rpi-image-gen installation
-        run: rpi-image-gen --version || rpi-image-gen --help
+        run: |
+          if ! command -v rpi-image-gen &> /dev/null; then
+            echo "ERROR: rpi-image-gen not found in PATH"
+            exit 1
+          fi
+          rpi-image-gen --help
       
       - name: Set up build environment
         run: |
