@@ -58,7 +58,7 @@ mmdebstrap:
     # Copy application files
     - |
       set -e
-      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_USER="pi"
       RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
       
       # Create application directory
@@ -91,7 +91,7 @@ mmdebstrap:
     # Install Python dependencies
     - |
       set -e
-      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_USER="pi"
       RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
       
       # Create and activate virtual environment as user
@@ -106,7 +106,7 @@ mmdebstrap:
     # Configure hotspot
     - |
       set -e
-      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_USER="pi"
       RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
       HOTSPOT_SSID="$IGconf_receipt_scanner_hotspot_ssid"
       HOTSPOT_PASS="$IGconf_receipt_scanner_hotspot_password"
@@ -136,7 +136,7 @@ mmdebstrap:
     # Install systemd services
     - |
       set -e
-      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_USER="pi"
       RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
       
       # Install service files
@@ -157,7 +157,7 @@ mmdebstrap:
     # Install first-boot customization script
     - |
       set -e
-      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_USER="pi"
       
       # Copy firstboot script from image-gen directory
       install -D -m 755 "$BDEBSTRAP_SOURCEDIR/../image-gen/firstboot.sh" \
