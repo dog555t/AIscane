@@ -23,15 +23,6 @@ jobs:
       contents: write  # Required to create releases and upload assets
       
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 8192
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-      
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -39,18 +30,10 @@ jobs:
       
       - name: Install rpi-image-gen
         run: |
-          # Clone rpi-image-gen (requires network access to github.com)
           git clone --depth 1 https://github.com/raspberrypi/rpi-image-gen.git /tmp/rpi-image-gen
-          
-          # Install dependencies (requires network access to package repositories)
           cd /tmp/rpi-image-gen
           sudo ./install_deps.sh
-          
-          # Add to PATH
           echo "/tmp/rpi-image-gen" >> $GITHUB_PATH
-          
-          # Verify installation
-          /tmp/rpi-image-gen/rpi-image-gen --help
       
       - name: Set up build environment
         run: |
@@ -67,10 +50,6 @@ jobs:
       - name: Build image
         run: |
           cd image-gen
-          
-          # Build the image using rpi-image-gen
-          # Note: runs as regular user, not sudo
-          # Requires network access to download Debian packages and Python dependencies
           WORK_DIR="${{ env.WORK_DIR }}" ./build-image.sh
       
       - name: Prepare release artifacts
