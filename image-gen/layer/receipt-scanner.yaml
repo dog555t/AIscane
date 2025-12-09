@@ -1,0 +1,190 @@
+# METABEGIN
+# X-Env-Layer-Name: receipt-scanner
+# X-Env-Layer-Category: app
+# X-Env-Layer-Desc: Receipt Scanner web application with AI camera support, OCR,
+#  hotspot configuration, and battery monitoring. Installs the complete receipt
+#  scanner application with all dependencies and services configured to start
+#  automatically on boot.
+# X-Env-Layer-Requires: rpi-user-credentials,systemd-net-min
+#
+# X-Env-VarPrefix: receipt_scanner
+#
+# X-Env-Var-hotspot_ssid: Receipt-Scanner
+# X-Env-Var-hotspot_ssid-Desc: WiFi hotspot SSID for the receipt scanner
+# X-Env-Var-hotspot_ssid-Required: n
+# X-Env-Var-hotspot_ssid-Set: y
+#
+# X-Env-Var-hotspot_password: receipt1234
+# X-Env-Var-hotspot_password-Desc: WiFi hotspot password
+# X-Env-Var-hotspot_password-Required: n
+# X-Env-Var-hotspot_password-Set: y
+#
+# X-Env-Var-web_admin_user: admin
+# X-Env-Var-web_admin_user-Desc: Web interface admin username
+# X-Env-Var-web_admin_user-Required: n
+# X-Env-Var-web_admin_user-Set: y
+#
+# X-Env-Var-web_admin_pass: admin123
+# X-Env-Var-web_admin_pass-Desc: Web interface admin password
+# X-Env-Var-web_admin_pass-Required: n
+# X-Env-Var-web_admin_pass-Set: y
+# METAEND
+---
+mmdebstrap:
+  packages:
+    # Python and core dependencies
+    - python3
+    - python3-venv
+    - python3-pip
+    # OCR dependencies
+    - tesseract-ocr
+    - libtesseract-dev
+    # Image processing dependencies
+    - libatlas-base-dev
+    - libopenjp2-7
+    - libjpeg-dev
+    # Network services for hotspot
+    - hostapd
+    - dnsmasq
+    # Utilities
+    - git
+    - sqlite3
+    - iptables-persistent
+    # Camera support
+    - libcamera-apps
+    - libcamera-tools
+  
+  customize-hooks:
+    # Copy application files
+    - |
+      set -e
+      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
+      
+      # Create application directory
+      install -d -o "$RECEIPT_USER" -g "$RECEIPT_USER" "$1$RECEIPT_HOME"
+      
+      # Copy application files (excluding development artifacts)
+      rsync -a \
+        --exclude '.git' \
+        --exclude '__pycache__' \
+        --exclude '.venv' \
+        --exclude '.pytest_cache' \
+        --exclude 'node_modules' \
+        --exclude '*.pyc' \
+        --exclude '*.pyo' \
+        --exclude '.DS_Store' \
+        --exclude 'work' \
+        --exclude 'pi-gen-build' \
+        --exclude '*.img' \
+        --exclude '*.img.xz' \
+        "$BDEBSTRAP_SOURCEDIR/../" "$1$RECEIPT_HOME/"
+      
+      # Ensure correct ownership
+      chroot "$1" chown -R "$RECEIPT_USER:$RECEIPT_USER" "$RECEIPT_HOME"
+      
+      # Create data directories
+      install -d -o "$RECEIPT_USER" -g "$RECEIPT_USER" \
+        "$1$RECEIPT_HOME/data/images" \
+        "$1$RECEIPT_HOME/data/exports"
+    
+    # Install Python dependencies
+    - |
+      set -e
+      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
+      
+      # Create and activate virtual environment as user
+      chroot "$1" su - "$RECEIPT_USER" -c "
+        cd $RECEIPT_HOME
+        python3 -m venv .venv
+        . .venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+      "
+    
+    # Configure hotspot
+    - |
+      set -e
+      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
+      HOTSPOT_SSID="$IGconf_receipt_scanner_hotspot_ssid"
+      HOTSPOT_PASS="$IGconf_receipt_scanner_hotspot_password"
+      
+      # Copy hotspot configuration files
+      install -D -m 644 "$1$RECEIPT_HOME/config/hotspot/hostapd.conf" \
+        "$1/etc/hostapd/hostapd.conf"
+      install -D -m 644 "$1$RECEIPT_HOME/config/hotspot/dnsmasq.conf" \
+        "$1/etc/dnsmasq.conf"
+      install -D -m 644 "$1$RECEIPT_HOME/config/hotspot/routed-ap.conf" \
+        "$1/etc/dhcpcd.conf.d/receipt-ap.conf"
+      
+      # Update hostapd config with custom SSID and password
+      sed -i "s/^ssid=.*/ssid=$HOTSPOT_SSID/" "$1/etc/hostapd/hostapd.conf"
+      sed -i "s/^wpa_passphrase=.*/wpa_passphrase=$HOTSPOT_PASS/" "$1/etc/hostapd/hostapd.conf"
+      
+      # Configure hostapd daemon
+      echo 'DAEMON_CONF="/etc/hostapd/hostapd.conf"' > "$1/etc/default/hostapd"
+      
+      # Enable IP forwarding
+      echo 'net.ipv4.ip_forward=1' >> "$1/etc/sysctl.conf"
+      
+      # Copy iptables helper script
+      install -D -m 755 "$1$RECEIPT_HOME/config/hotspot/iptables.sh" \
+        "$1/usr/local/sbin/receipt-iptables.sh"
+    
+    # Install systemd services
+    - |
+      set -e
+      RECEIPT_USER="$IGconf_device_user1"
+      RECEIPT_HOME="/home/$RECEIPT_USER/receipt-scanner"
+      
+      # Install service files
+      install -D -m 644 "$1$RECEIPT_HOME/services/receipt_scanner.service" \
+        "$1/etc/systemd/system/receipt_scanner.service"
+      install -D -m 644 "$1$RECEIPT_HOME/services/battery_monitor.service" \
+        "$1/etc/systemd/system/battery_monitor.service"
+      install -D -m 644 "$1$RECEIPT_HOME/services/hotspot_nat.service" \
+        "$1/etc/systemd/system/hotspot_nat.service"
+      
+    # Enable I2C for battery monitoring
+    - |
+      set -e
+      if ! grep -q "^dtparam=i2c_arm=on" "$1/boot/firmware/config.txt" 2>/dev/null; then
+        echo "dtparam=i2c_arm=on" >> "$1/boot/firmware/config.txt"
+      fi
+    
+    # Install first-boot customization script
+    - |
+      set -e
+      RECEIPT_USER="$IGconf_device_user1"
+      
+      # Copy firstboot script from image-gen directory
+      install -D -m 755 "$BDEBSTRAP_SOURCEDIR/../image-gen/firstboot.sh" \
+        "$1/usr/local/sbin/receipt-scanner-firstboot.sh"
+      
+      # Create first-boot service
+      cat > "$1/etc/systemd/system/receipt-scanner-firstboot.service" << 'EOFSERVICE'
+[Unit]
+Description=Receipt Scanner First Boot Customization
+After=network-online.target
+Before=receipt_scanner.service battery_monitor.service
+ConditionPathExists=!/var/lib/receipt-scanner-firstboot-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/receipt-scanner-firstboot.sh
+ExecStartPost=/bin/touch /var/lib/receipt-scanner-firstboot-done
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOFSERVICE
+    
+    # Enable all services (one per line for readability)
+    - $BDEBSTRAP_HOOKS/enable-units "$1" receipt_scanner
+    - $BDEBSTRAP_HOOKS/enable-units "$1" battery_monitor
+    - $BDEBSTRAP_HOOKS/enable-units "$1" hotspot_nat
+    - $BDEBSTRAP_HOOKS/enable-units "$1" hostapd
+    - $BDEBSTRAP_HOOKS/enable-units "$1" dnsmasq
+    - $BDEBSTRAP_HOOKS/enable-units "$1" receipt-scanner-firstboot
