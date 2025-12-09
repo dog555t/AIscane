@@ -39,10 +39,10 @@ jobs:
       
       - name: Install rpi-image-gen
         run: |
-          # Clone rpi-image-gen
+          # Clone rpi-image-gen (requires network access to github.com)
           git clone --depth 1 https://github.com/raspberrypi/rpi-image-gen.git /tmp/rpi-image-gen
           
-          # Install dependencies
+          # Install dependencies (requires network access to package repositories)
           cd /tmp/rpi-image-gen
           sudo ./install_deps.sh
           
@@ -70,6 +70,7 @@ jobs:
           
           # Build the image using rpi-image-gen
           # Note: runs as regular user, not sudo
+          # Requires network access to download Debian packages and Python dependencies
           WORK_DIR="${{ env.WORK_DIR }}" ./build-image.sh
       
       - name: Prepare release artifacts

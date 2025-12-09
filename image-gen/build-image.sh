@@ -40,6 +40,40 @@ if [ "$(id -u)" -eq 0 ]; then
     exit 1
 fi
 
+# Check network connectivity (important for package downloads)
+echo "Checking network connectivity..."
+if command -v curl &> /dev/null; then
+    if ! curl -s --connect-timeout 5 https://deb.debian.org/ > /dev/null 2>&1; then
+        echo "WARNING: Cannot reach Debian package repositories"
+        echo "Build requires internet access to download packages"
+        echo "Please check your network connection and firewall settings"
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    else
+        echo "✓ Network connectivity confirmed"
+    fi
+elif command -v wget &> /dev/null; then
+    if ! wget --spider --timeout=5 https://deb.debian.org/ > /dev/null 2>&1; then
+        echo "WARNING: Cannot reach Debian package repositories"
+        echo "Build requires internet access to download packages"
+        echo "Please check your network connection and firewall settings"
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    else
+        echo "✓ Network connectivity confirmed"
+    fi
+else
+    echo "Note: Cannot verify network connectivity (curl/wget not found)"
+    echo "Build requires internet access to download packages"
+fi
+echo ""
+
 # Create work directory if it doesn't exist
 mkdir -p "$WORK_DIR"
 

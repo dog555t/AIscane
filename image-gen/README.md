@@ -35,7 +35,17 @@ export PATH="$PWD:$PATH"
 - Debian/Ubuntu-based Linux (Debian Bookworm or Trixie recommended)
 - At least 10GB free disk space
 - Regular user account (do NOT run as root)
-- Internet connection for downloading packages
+- **Internet connection required** for:
+  - Downloading Debian/Raspbian packages
+  - Installing Python dependencies via pip
+  - Cloning rpi-image-gen (first-time setup)
+- **Network access** to:
+  - `deb.debian.org` and Debian mirror repositories
+  - `archive.raspberrypi.org` for Raspberry Pi specific packages
+  - `pypi.org` for Python packages
+  - `github.com` for rpi-image-gen
+
+**Note**: If building behind a firewall or proxy, ensure the above domains are accessible.
 
 ## Building the Image
 
@@ -218,6 +228,35 @@ rpi-image-gen layer -S . --describe receipt-scanner
 These commands help ensure your configuration is correct before starting a time-consuming build.
 
 ## Troubleshooting
+
+### Network Connectivity Issues
+
+If the build fails with package download errors:
+
+```bash
+# Test connectivity to Debian repositories
+curl -I https://deb.debian.org/
+curl -I https://archive.raspberrypi.org/
+
+# Test connectivity to PyPI
+curl -I https://pypi.org/
+
+# If behind a proxy, set proxy environment variables
+export http_proxy=http://proxy.example.com:8080
+export https_proxy=http://proxy.example.com:8080
+```
+
+**Common causes:**
+- Firewall blocking package repositories
+- Corporate proxy not configured
+- DNS resolution issues
+- Network timeout during large downloads
+
+**Solutions:**
+- Ensure firewall allows access to Debian, Raspbian, and PyPI repositories
+- Configure proxy settings if behind a corporate firewall
+- Increase timeout values in podman/mmdebstrap config if on slow connection
+- Use a local package cache/mirror if available
 
 ### "rpi-image-gen not found"
 

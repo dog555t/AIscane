@@ -53,6 +53,34 @@ Test the build configuration without actually building:
 
 ## Build Testing
 
+### Prerequisites Check
+
+Before building, verify system prerequisites:
+
+```bash
+# Check network connectivity (required for package downloads)
+curl -I https://deb.debian.org/
+curl -I https://archive.raspberrypi.org/
+curl -I https://pypi.org/
+
+# If behind a firewall or proxy, configure proxy settings
+export http_proxy=http://proxy.example.com:8080
+export https_proxy=http://proxy.example.com:8080
+
+# Verify rpi-image-gen is installed
+which rpi-image-gen
+
+# Check available disk space (need 10GB+)
+df -h .
+```
+
+**Important**: The build requires unrestricted network access to:
+- Debian/Raspbian package repositories (`deb.debian.org`, `archive.raspberrypi.org`)
+- Python Package Index (`pypi.org`)
+- GitHub for rpi-image-gen (`github.com`)
+
+If you recently removed firewall restrictions, the build script will verify connectivity before proceeding.
+
 ### Local Build Test
 
 Perform a test build on a local machine:
@@ -60,13 +88,14 @@ Perform a test build on a local machine:
 ```bash
 cd image-gen
 
-# Run the build script
+# Run the build script (includes automatic network check)
 ./build-image.sh
 
 # Monitor the build process
 # - Should complete in 30-60 minutes
 # - Check for any error messages
 # - Verify no permission errors (should not require sudo)
+# - Watch for package download progress
 ```
 
 ### Verify Build Artifacts
