@@ -84,11 +84,11 @@ echo ""
 # Build the image
 # -S sets the source directory for custom layers and configs
 # -c specifies the config file
-# -W sets the work directory
+# -B sets the work directory
 rpi-image-gen build \
     -S "$SCRIPT_DIR" \
     -c "$CONFIG_FILE" \
-    -W "$WORK_DIR"
+    -B "$WORK_DIR"
 
 # Find the built image
 IMAGE_DIR="$WORK_DIR/image-${IMAGE_NAME}"
