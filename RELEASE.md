@@ -255,8 +255,8 @@ For urgent bug fixes:
 
 ### Out of Disk Space
 - Local builds need 10GB+ free space (less than old pi-gen system)
+- GitHub Actions runners typically have 14GB+ available, which is sufficient
 - Clean old builds: `rm -rf work`
-- Ensure your GitHub Actions runner has sufficient space available
 
 ### "rpi-image-gen not found"
 - Make sure rpi-image-gen is installed and in your PATH

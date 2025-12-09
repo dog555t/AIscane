@@ -34,6 +34,9 @@ jobs:
           cd /tmp/rpi-image-gen
           sudo ./install_deps.sh
           echo "/tmp/rpi-image-gen" >> $GITHUB_PATH
+          
+      - name: Verify rpi-image-gen installation
+        run: rpi-image-gen --version || rpi-image-gen --help
       
       - name: Set up build environment
         run: |
