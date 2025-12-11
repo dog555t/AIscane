@@ -83,7 +83,7 @@ The fastest way to get started is using the pre-built standalone image:
 6. **Login with default credentials**: username `admin`, password `admin123`
 7. **⚠️ Change password immediately** via user menu → Change Password
 
-Default OS login: username `pi`, password `raspberry` (⚠️ change after first login!)
+Default OS login: username `pi`, password `RaspberryPi@2024` (⚠️ change after first login!)
 
 The pre-built image includes everything configured and ready to use.
 

@@ -87,7 +87,7 @@ The primary configuration is in `config/receipt-scanner.yaml`:
 device:
   layer: rpi5              # Target Raspberry Pi 5
   user1: pi                # Default username
-  user1pass: raspberry     # Default password
+  user1pass: RaspberryPi@2024  # Default password (meets security requirements)
 
 image:
   layer: image-rpios       # Use RPi OS image layout
@@ -186,7 +186,7 @@ Pre-built images are available on the [Releases page](https://github.com/dog555t
 3. Connect to WiFi "Receipt-Scanner" (password: `receipt1234`)
 4. Open browser to `http://192.168.4.1`
 5. Default web login: `admin` / `admin123`
-6. Default OS login: `pi` / `raspberry`
+6. Default OS login: `pi` / `RaspberryPi@2024`
 
 ⚠️ **Change both passwords immediately!**
 

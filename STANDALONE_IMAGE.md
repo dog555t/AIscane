@@ -111,7 +111,7 @@ sync
 
 **System Login** (SSH or console):
 - Username: `pi`
-- Password: `raspberry`
+- Password: `RaspberryPi@2024`
 - ⚠️ Change immediately: `ssh pi@192.168.4.1` then run `passwd`
 
 **Web Interface**:
