@@ -5,7 +5,7 @@
 device:
   layer: rpi5
   user1: pi
-  user1pass: raspberry
+  user1pass: RaspberryPi@2024
 
 image:
   layer: image-rpios
