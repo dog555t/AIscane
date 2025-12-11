@@ -155,32 +155,19 @@ mmdebstrap:
         echo "dtparam=i2c_arm=on" >> "$1/boot/firmware/config.txt"
       fi
     
-    # Install first-boot customization script
+    # Install first-boot customization script and service
     - |
       set -e
       RECEIPT_USER="pi"
+      LAYER_DIR="$BDEBSTRAP_SOURCEDIR/layer/receipt-scanner"
       
       # Copy firstboot script from image-gen directory
       install -D -m 755 "$BDEBSTRAP_SOURCEDIR/../image-gen/firstboot.sh" \
         "$1/usr/local/sbin/receipt-scanner-firstboot.sh"
       
-      # Create first-boot service
-      cat > "$1/etc/systemd/system/receipt-scanner-firstboot.service" << 'EOFSERVICE'
-[Unit]
-Description=Receipt Scanner First Boot Customization
-After=network-online.target
-Before=receipt_scanner.service battery_monitor.service
-ConditionPathExists=!/var/lib/receipt-scanner-firstboot-done
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/sbin/receipt-scanner-firstboot.sh
-ExecStartPost=/bin/touch /var/lib/receipt-scanner-firstboot-done
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOFSERVICE
+      # Copy firstboot systemd service
+      install -D -m 644 "$LAYER_DIR/files/etc/systemd/system/receipt-scanner-firstboot.service" \
+        "$1/etc/systemd/system/receipt-scanner-firstboot.service"
     
     # Enable all services (one per line for readability)
     - $BDEBSTRAP_HOOKS/enable-units "$1" receipt_scanner
