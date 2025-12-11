@@ -1,0 +1,14 @@
+[Unit]
+Description=Receipt Scanner First Boot Customization
+After=network-online.target
+Before=receipt_scanner.service battery_monitor.service
+ConditionPathExists=!/var/lib/receipt-scanner-firstboot-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/receipt-scanner-firstboot.sh
+ExecStartPost=/bin/touch /var/lib/receipt-scanner-firstboot-done
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
