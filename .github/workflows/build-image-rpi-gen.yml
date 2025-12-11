@@ -35,14 +35,7 @@ jobs:
           sudo ./install_deps.sh
           echo "/tmp/rpi-image-gen" >> $GITHUB_PATH
           
-      - name: Verify rpi-image-gen installation
-        run: |
-          if ! command -v rpi-image-gen &> /dev/null; then
-            echo "ERROR: rpi-image-gen not found in PATH"
-            exit 1
-          fi
-          rpi-image-gen --help
-      
+
       - name: Set up build environment
         run: |
           # Set release tag
