@@ -96,7 +96,7 @@ image:
   name: receipt-scanner    # Image name
 
 layer:
-  base: bookworm-desktop-min  # Minimal desktop base
+  base: bookworm-minbase      # Minimal Debian Bookworm base
   app: receipt-scanner        # Custom application layer
 
 # Application-specific settings

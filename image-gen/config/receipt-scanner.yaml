@@ -14,7 +14,7 @@ image:
   name: receipt-scanner
 
 layer:
-  base: bookworm-desktop-min
+  base: bookworm-minbase
   app: receipt-scanner
 
 # Receipt Scanner application settings
