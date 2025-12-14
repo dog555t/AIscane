@@ -11,16 +11,13 @@ AIscane/
 ├── ocr.py                      # OCR processing (Tesseract)
 ├── data_store.py              # SQLite/CSV storage
 ├── battery_monitor.py          # UPS monitoring
+├── auth.py                     # Authentication and user management
 ├── config/                     # Configuration files
 │   └── hotspot/               # WiFi hotspot configs
 ├── services/                   # Systemd service files
 ├── templates/                  # HTML templates
-├── image/                      # Image building tools
-│   ├── build-image.sh         # Automated build script
-│   ├── firstboot.sh           # First-boot customization
-│   ├── os_list_imagingutility.json  # Pi Imager metadata
-│   └── stage-receipt-scanner/ # Pi-gen custom stage
-└── .github/workflows/         # CI/CD automation
+├── static/                     # Static assets (CSS, JS)
+└── data/                       # Application data (created at runtime)
 ```
 
 ## Development Setup
@@ -63,33 +60,15 @@ The application includes fallback modes for development without Raspberry Pi har
 - **Battery**: Logs warnings if I2C/UPS not present
 - **Hotspot**: Can be disabled for development
 
-## Building Images
+## Running the Application
 
-### Local Build
-
-```bash
-cd image
-sudo ./build-image.sh
-```
-
-Requirements:
-- Ubuntu/Debian Linux host
-- 20GB+ free disk space
-- Root access
-- Internet connection
-
-Build time: 30-60 minutes
-
-### CI/CD Build
-
-Images are automatically built when version tags are pushed:
+The application is designed to run in any folder on your Raspberry Pi. After setting up the development environment, simply run:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+python app.py
 ```
 
-Monitor at: https://github.com/dog555t/AIscane/actions
+The web interface will be available at http://localhost:5000 (or http://192.168.4.1 when using the hotspot).
 
 ## Making Changes
 
@@ -105,17 +84,16 @@ Monitor at: https://github.com/dog555t/AIscane/actions
 ### Documentation Changes
 
 - Update relevant `.md` files
-- Keep `STANDALONE_IMAGE.md` user-focused
-- Keep `image/README.md` build-focused
-- Keep `RELEASE.md` maintainer-focused
+- Keep README.md user-focused and clear
+- Document any new features or configuration options
 
-### Image Configuration Changes
+### Configuration Changes
 
 If you modify:
 - **Hotspot settings**: Update `config/hotspot/`
-- **Services**: Update `services/` and `image/stage-receipt-scanner/01-setup.sh`
-- **Dependencies**: Update `requirements.txt` and `image/stage-receipt-scanner/00-packages`
-- **First-boot**: Update `image/firstboot.sh`
+- **Services**: Update `services/` systemd unit files
+- **Dependencies**: Update `requirements.txt`
+- **Authentication**: Update relevant sections in README.md
 
 ## Testing
 
@@ -135,13 +113,13 @@ python -c "from data_store import store_receipt; print('DB OK')"
 ### Hardware Testing
 
 Test on actual Raspberry Pi:
-1. Flash your built image to SD card
-2. Boot and verify first boot completion
-3. Connect to hotspot
+1. Clone the repository to your Raspberry Pi
+2. Set up the Python environment
+3. Run the application
 4. Test web interface
 5. Test camera capture
 6. Test OCR processing
-7. Verify service status: `systemctl status receipt_scanner`
+7. Verify service status: `systemctl status receipt_scanner` (if systemd services are installed)
 
 ### Integration Testing
 
@@ -162,36 +140,15 @@ tesseract test.jpg stdout
 
 ## Release Process
 
-See [RELEASE.md](RELEASE.md) for detailed release instructions.
-
-Quick version:
+To create a new release:
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-GitHub Actions handles the rest.
+This tags the version in the repository.
 
 ## Troubleshooting
-
-### Build Issues
-
-**Out of space:**
-```bash
-# Clean old builds
-sudo rm -rf pi-gen-build/work pi-gen-build/deploy
-```
-
-**Permission errors:**
-```bash
-# Ensure running as root
-sudo ./build-image.sh
-```
-
-**Package errors:**
-- Check internet connection
-- Verify package names in `image/stage-receipt-scanner/00-packages`
-- Check pi-gen compatibility with current Raspberry Pi OS version
 
 ### Runtime Issues
 
@@ -243,16 +200,16 @@ sudo systemctl restart receipt_scanner
 
 ## Resources
 
-- **pi-gen**: https://github.com/RPi-Distro/pi-gen
 - **Raspberry Pi Documentation**: https://www.raspberrypi.com/documentation/
 - **Tesseract OCR**: https://github.com/tesseract-ocr/tesseract
 - **Flask**: https://flask.palletsprojects.com/
+- **Flask-Login**: https://flask-login.readthedocs.io/
 
 ## Support
 
 - **Issues**: https://github.com/dog555t/AIscane/issues
 - **Discussions**: https://github.com/dog555t/AIscane/discussions
-- **Documentation**: See README.md and STANDALONE_IMAGE.md
+- **Documentation**: See README.md
 
 ---
 

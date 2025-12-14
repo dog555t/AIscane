@@ -1,10 +1,8 @@
 # Raspberry Pi Receipt Scanner (Offline Hotspot)
 
-[![Download Latest Image](https://img.shields.io/github/v/release/dog555t/AIscane?label=Download%20Standalone%20Image)](https://github.com/dog555t/AIscane/releases/latest) 
-
 This project turns a Raspberry Pi 5 + AI Camera Module into a self-contained receipt scanner. It captures receipts with `libcamera`, runs OCR, stores structured data in CSV (and SQLite), exposes a local Flask UI, and can broadcast its own Wi‑Fi hotspot so users can connect directly without a router. A MakerFocus UPS battery monitor handles safe shutdowns.
 
-> 🚀 **Quick Start**: Download the [pre-built standalone image](https://github.com/dog555t/AIscane/releases/latest) and flash it with [Raspberry Pi Imager](https://www.raspberrypi.com/software/). See [STANDALONE_IMAGE.md](STANDALONE_IMAGE.md) for complete instructions.
+> 🚀 **Quick Start**: Clone this repository to any folder on your Raspberry Pi and follow the installation steps below to run the application.
 
 ## Features
 - One-click capture via `/scan` or upload existing images via `/upload`.
@@ -69,83 +67,15 @@ export HIDE_DEFAULT_CREDENTIALS_HINT="true"  # Hide default credentials on login
 python app.py
 ```
 
-## Quick Start with Pre-built Image (Recommended)
+## Installation
 
-The fastest way to get started is using the pre-built standalone image:
-
-1. **Download the latest image** from [Releases](https://github.com/dog555t/AIscane/releases/latest)
-2. **Flash to SD card** using [Raspberry Pi Imager](https://www.raspberrypi.com/software/):
-   - Choose "Use custom" and select the downloaded `.img.xz` file
-   - Select your SD card and click "Write"
-3. **Boot your Raspberry Pi** with the flashed SD card
-4. **Connect to Wi-Fi**: SSID `Receipt-Scanner`, password `receipt1234`
-5. **Open browser** and navigate to `http://192.168.4.1`
-6. **Login with default credentials**: username `admin`, password `admin123`
-7. **⚠️ Change password immediately** via user menu → Change Password
-
-Default OS login: username `pi`, password `RaspberryPi@2024` (⚠️ change after first login!)
-
-The pre-built image includes everything configured and ready to use.
-
-## Build a Flashable Image (rpi-image-gen)
-
-You can produce a ready-to-boot Raspberry Pi OS image with everything preinstalled using the `image-gen/` folder and **rpi-image-gen** (the official Raspberry Pi image generation tool).
-
-### Why rpi-image-gen?
-
-The project has migrated from pi-gen to rpi-image-gen for:
-- ⚡ **Faster builds** - 30-60 minutes instead of 60-90 minutes
-- 🔒 **Better security** - No root required, uses podman unshare
-- 📝 **Simpler config** - Declarative YAML instead of shell scripts
-- 🎯 **Production-ready** - Official Raspberry Pi tool with same packages used worldwide
-
-### Prerequisites
-
-Install rpi-image-gen:
-```bash
-git clone https://github.com/raspberrypi/rpi-image-gen.git
-cd rpi-image-gen
-sudo ./install_deps.sh
-export PATH="$PWD:$PATH"
-```
-
-### Quick Build
+Clone the repository to any folder on your Raspberry Pi:
 
 ```bash
-cd image-gen
-./build-image.sh
+git clone https://github.com/dog555t/AIscane.git
+cd AIscane
 ```
-
-The script will:
-- Build the complete OS image using rpi-image-gen
-- Install all dependencies and configure services
-- Create a compressed `.img.xz` image in `work/`
-- Generate SHA256 checksums
-
-**Note:** Run as a regular user, NOT as root.
-
-### What Gets Installed
-
-The custom layer (`layer/receipt-scanner.yaml`) automatically:
-- Installs Python, Tesseract OCR, camera support, and all dependencies
-- Copies the app to `/home/pi/receipt-scanner` with virtual environment
-- Configures WiFi hotspot (SSID: Receipt-Scanner, password: receipt1234)
-- Enables systemd services (web app, battery monitor, hotspot NAT)
-- Sets up I2C for battery monitoring
-- Configures first-boot customization
-
-For more details see `image-gen/README.md`.
-
-### CI/CD Automated Builds
-Images are automatically built and released via GitHub Actions when a version tag is pushed:
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-=======
->> main
-## Configure the Wi‑Fi hotspot (hostapd + dnsmasq + dhcpcd)
+## Configure the Wi‑Fi hotspot (Optional)
 1. Install services:
 ```bash
 sudo apt-get install -y hostapd dnsmasq
@@ -167,7 +97,6 @@ echo 'net.ipv4.ip_forward=1' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 sudo bash config/hotspot/iptables.sh
 ```
-<< codex/build-raspberry-pi-receipt-scanner-project-q6udip
 You can also enable the provided systemd unit to enforce the NAT rules at boot:
 ```bash
 sudo cp services/hotspot_nat.service /etc/systemd/system/
@@ -176,8 +105,6 @@ sudo chmod +x /usr/local/sbin/receipt-iptables.sh
 sudo systemctl daemon-reload
 sudo systemctl enable --now hotspot_nat.service
 ```
-=======
->> main
 5. Restart services:
 ```bash
 sudo systemctl restart dhcpcd
@@ -189,8 +116,10 @@ The Pi now advertises SSID `Receipt-Scanner` (password `receipt1234`) and hands 
 ### Optional: NetworkManager approach (Bookworm desktop)
 Add a connection profile `/etc/NetworkManager/system-connections/receipt-scanner.nmconnection` with mode `ap`, SSID `Receipt-Scanner`, security WPA2, and IPv4 shared mode with address `192.168.4.1/24` if you prefer NM instead of hostapd/dnsmasq.
 
-## Autostart with systemd
-Assuming the project lives in `/home/pi/receipt-scanner`:
+## Autostart with systemd (Optional)
+
+To run the application automatically at boot, you can set up systemd services. Update the paths in the service files if you cloned the repository to a location other than `/home/pi/receipt-scanner`:
+
 ```bash
 sudo cp services/receipt_scanner.service /etc/systemd/system/
 sudo cp services/battery_monitor.service /etc/systemd/system/
@@ -198,7 +127,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now receipt_scanner.service
 sudo systemctl enable --now battery_monitor.service
 ```
-Logs write to `/var/log/receipt_scanner*.log` and `/var/log/battery_monitor*.log`. Update paths inside the unit files if you keep the code elsewhere.
+Logs write to `/var/log/receipt_scanner*.log` and `/var/log/battery_monitor*.log`.
 
 ## Security
 
@@ -264,19 +193,10 @@ Unplug AC and watch `tail -f data/battery.log`; when percent dips below 10% the 
 - The Flask debug server is fine for single-user hotspot use. Swap for `gunicorn` if you expect higher load.
 - The `camera.py` helper saves a placeholder gray image if `libcamera` is missing; this keeps the UI usable for development without hardware.
 
-## Building Releases
+## Contributing
 
-To create a new release of the standalone OS image:
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-### Automated Release (Recommended)
-```bash
-# Create and push a version tag
-git tag -a v1.0.0 -m "Release version 1.0.0"
-git push origin v1.0.0
-```
+## License
 
-The GitHub Actions workflow will automatically build the image (~60-90 minutes) and create a release.
-
-**Or trigger manually:** Go to [Actions](https://github.com/dog555t/AIscane/actions/workflows/build-image.yml) → "Run workflow"
-
-For complete release documentation, see [RELEASE.md](RELEASE.md).
+See [LICENSE](LICENSE) for details.
