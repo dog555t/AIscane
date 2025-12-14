@@ -34,7 +34,17 @@ templates/              # HTML templates
 - Python 3.11+ with pip.
 - MakerFocus Raspberry Pi 4 Battery Pack UPS V3Plus connected via I²C (fuel-gauge address 0x36 assumed).
 
-## Install Python environment
+## Installation
+
+Clone the repository to any folder on your Raspberry Pi:
+
+```bash
+git clone https://github.com/dog555t/AIscane.git
+cd AIscane
+```
+
+Install system dependencies and set up Python environment:
+
 ```bash
 sudo apt-get update
 sudo apt-get install -y python3-pip python3-venv tesseract-ocr libtesseract-dev libatlas-base-dev libopenjp2-7 libjpeg-dev
@@ -44,11 +54,15 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## Run the web app manually
+## Running the Application
+
+Start the Flask web application:
+
 ```bash
 source .venv/bin/activate
 python app.py
 ```
+
 Visit http://127.0.0.1:5000 (or http://192.168.4.1 when on the hotspot).
 
 **Default login credentials:**
@@ -58,22 +72,15 @@ Visit http://127.0.0.1:5000 (or http://192.168.4.1 when on the hotspot).
 ⚠️ **Important**: Change the default password after first login via the user menu → Change Password.
 
 ### Customize Authentication (Optional)
+
 Set environment variables before running the app:
+
 ```bash
 export RECEIPT_SCANNER_USERNAME="myusername"
 export RECEIPT_SCANNER_PASSWORD="mypassword"
 export SECRET_KEY="your-secret-key-here"
 export HIDE_DEFAULT_CREDENTIALS_HINT="true"  # Hide default credentials on login page
 python app.py
-```
-
-## Installation
-
-Clone the repository to any folder on your Raspberry Pi:
-
-```bash
-git clone https://github.com/dog555t/AIscane.git
-cd AIscane
 ```
 ## Configure the Wi‑Fi hotspot (Optional)
 1. Install services:
